@@ -2,13 +2,14 @@
 name = "climate-intervention-vbd"
 
 [tool.pixi.project]
-channels = ["conda-forge"]
+channels = ["conda-forge", "bioconda"]
 platforms = ["linux-64", "linux-aarch64", "osx-arm64", "osx-64", "win-64"]
 
 [tool.pixi.dependencies]
 ipykernel = "*"
 jupyter_bokeh = "*"
 python-dotenv = "*"
+snakemake = "*"
 # climepi dependencies
 bottleneck = "*"
 dask = ">=2024.11.2"
