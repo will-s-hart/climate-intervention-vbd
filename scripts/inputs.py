@@ -41,6 +41,7 @@ DATASETS = {
         },
         "save_dir": DATA_DIR / "glens_control",
         "api_token": CDG_API_TOKEN,
+        "simplecache": True,
     },
     "glens_feedback": {
         "data_source": "glens",
@@ -54,6 +55,7 @@ DATASETS = {
         },
         "save_dir": DATA_DIR / "glens_feedback",
         "api_token": CDG_API_TOKEN,
+        "simplecache": True,
     },
 }
 
