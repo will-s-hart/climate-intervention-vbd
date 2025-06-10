@@ -78,7 +78,7 @@ rule glens_control:
 
 rule glens_feedback:
     input:
-        glens_control_download_files,
+        glens_feedback_download_files,
     output:
         "results/glens_feedback.nc",
     shell:
