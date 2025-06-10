@@ -1,9 +1,11 @@
 import argparse
 import pathlib
+import time
 
 import numpy as np
 from climepi import climdata
 from inputs import DATASETS
+from requests.exceptions import HTTPError
 
 
 def _get_data(dataset, year_range=None, realizations=None):
@@ -13,7 +15,14 @@ def _get_data(dataset, year_range=None, realizations=None):
         kwargs["subset"]["years"] = list(range(start_year, end_year + 1))
     if realizations is not None:
         kwargs["subset"]["realizations"] = realizations
-    return climdata.get_climate_data(**kwargs)
+    try:
+        return climdata.get_climate_data(**kwargs)
+    except HTTPError as e:
+        if e.response.status_code == 429:
+            print("Too many requests, waiting for up to 60 seconds and retrying...")
+            time.sleep(np.random.rand() * 60)
+            return _get_data(dataset, year_range, realizations)
+        raise e
 
 
 if __name__ == "__main__":
