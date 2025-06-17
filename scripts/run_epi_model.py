@@ -14,6 +14,7 @@ def _run_epi_model(
 ):
     if realizations is None:
         realizations = DATASETS[dataset]["subset"]["realizations"]
+    realizations = np.atleast_1d(realizations)
     data_dir = DATASETS[dataset]["save_dir"]
     save_dir = pathlib.Path(__file__).parents[1] / "results"
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -21,7 +22,7 @@ def _run_epi_model(
     ds_clim = xr.open_mfdataset(str(data_dir / "*.nc"), data_vars="minimal", chunks={})
     ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
     datasets = [
-        ds_clim.sel(realization=realization).climepi.run_epi_model(
+        ds_clim.sel(realization=[realization]).climepi.run_epi_model(
             epi_model, return_yearly_portion_suitable=True
         )
         for realization in realizations
