@@ -44,13 +44,25 @@ result_files = [
 ]
 
 
-# Final targets
 rule all:
     input:
         download_files + result_files,
 
 
+rule downloads:
+    input:
+        download_files,
+
+
+rule results:
+    input:
+        result_files,
+
+
 rule download_data:
+    input:
+        "scripts/inputs.py",
+        "scripts/download_data.py",
     output:
         get_download_file("{dataset}", "{realization}", "{year_range}"),
     shell:
@@ -68,6 +80,8 @@ rule run_epi_model:
             get_download_file(wildcards.dataset, wildcards.realization, y)
             for y in DATASETS[wildcards.dataset]["year_ranges"]
         ],
+        "scripts/inputs.py",
+        "scripts/run_epi_model.py",
     output:
         get_result_file("{dataset}", "{realization}"),
     shell:
