@@ -1,11 +1,9 @@
 import argparse
 import pathlib
-import time
 
 import numpy as np
 from climepi import climdata
 from inputs import DATASETS
-from requests.exceptions import HTTPError
 
 
 def _get_data(dataset, year_range=None, realizations=None):
