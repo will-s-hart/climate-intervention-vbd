@@ -196,6 +196,9 @@ cython_debug/
 # snakemake
 .snakemake/
 
+# OS generated files
+.DS_Store
+
 # Scripts for cluster workflows
 cluster/
 
