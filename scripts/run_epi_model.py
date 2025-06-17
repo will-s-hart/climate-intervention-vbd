@@ -15,7 +15,7 @@ def _run_epi_model(
     if realizations is None:
         realizations = DATASETS[dataset]["subset"]["realizations"]
     data_dir = DATASETS[dataset]["save_dir"]
-    save_dir = pathlib.Path(__file__).parents[1] / f"results/{dataset}"
+    save_dir = pathlib.Path(__file__).parents[1] / "results"
     save_dir.mkdir(parents=True, exist_ok=True)
     epi_model = epimod.get_example_model(EPI_MODEL_NAME)
     ds_clim = xr.open_mfdataset(str(data_dir / "*.nc"), data_vars="minimal", chunks={})
