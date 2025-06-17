@@ -2,29 +2,32 @@ import argparse
 import pathlib
 
 import dask.diagnostics
+import numpy as np
+import xarray as xr
 from climepi import epimod
-from download_data import _get_data
-from inputs import EPI_MODEL_NAME
+from inputs import DATASETS, EPI_MODEL_NAME
 
 
 def _run_epi_model(
     dataset=None,
     realizations=None,
 ):
-    ds_clim = _get_data(dataset=dataset, realizations=realizations)
+    if realizations is None:
+        realizations = DATASETS[dataset]["subset"]["realizations"]
+    save_dir = DATASETS[dataset]["save_dir"]
     epi_model = epimod.get_example_model(EPI_MODEL_NAME)
-    for realization in ds_clim.realization.values:
-        print(f"Running epi model for dataset {dataset}, realization {realization}")
-        ds_epi_curr = ds_clim.sel(realization=[realization]).climepi.run_epi_model(
+    ds_clim = xr.open_mfdataset(str(save_dir / "*.nc"), chunks={})
+    ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
+    datasets = [
+        ds_clim.sel(realization=realization).climepi.run_epi_model(
             epi_model, return_yearly_portion_suitable=True
         )
-        path_curr = (
-            pathlib.Path(__file__).parents[1] / f"results/{dataset}_{realization}.nc"
-        )
-        delayed_obj = ds_epi_curr.to_netcdf(path_curr, compute=False)
-        with dask.diagnostics.ProgressBar():
-            delayed_obj.compute()
-        print(f"Saved results to {path_curr}")
+        for realization in realizations
+    ]
+    paths = [save_dir / f"{dataset}_{realization}.nc" for realization in realizations]
+    delayed_obj = xr.save_mfdataset(datasets, paths, compute=False)
+    with dask.diagnostics.ProgressBar():
+        delayed_obj.compute()
 
 
 if __name__ == "__main__":
