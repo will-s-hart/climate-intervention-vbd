@@ -51,12 +51,25 @@ DATASETS = {
             + list(range(2060, 2070))
             + list(range(2080, 2090)),
             "scenarios": ["sai"],
-            "realizations": list(range(20)),
+            "realizations": list(range(3)),
         },
         "save_dir": DATA_DIR / "glens_feedback",
         "api_token": CDG_API_TOKEN,
         "full_download": True,
     },
+    "glens_feedbackrest": {
+        "data_source": "glens",
+        "frequency": "daily",
+        "subset": {
+            "years": list(range(2020, 2030))
+            + list(range(2060, 2070))
+            + list(range(2080, 2090)),
+            "scenarios": ["sai"],
+            "realizations": list(range(3, 20)),
+        },
+        "save_dir": DATA_DIR / "glens_feedbackrest",
+        "api_token": CDG_API_TOKEN,
+        "full_download": True,
+    },
 }
-
 EPI_MODEL_NAME = "mordecai_ae_aegypti_niche"
