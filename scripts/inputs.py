@@ -13,7 +13,7 @@ DATASETS = {
         "data_source": "arise",
         "frequency": "daily",
         "subset": {
-            "years": list(range(2020, 2030)) + list(range(2060, 2070)),
+            "years": list(range(2019, 2030)) + list(range(2059, 2070)),
             "scenarios": ["ssp245"],
             "realizations": list(range(10)),
         },
@@ -23,7 +23,7 @@ DATASETS = {
         "data_source": "arise",
         "frequency": "daily",
         "subset": {
-            "years": list(range(2060, 2070)),
+            "years": list(range(2059, 2070)),
             "scenarios": ["sai15"],
             "realizations": list(range(10)),
         },
@@ -33,9 +33,9 @@ DATASETS = {
         "data_source": "glens",
         "frequency": "daily",
         "subset": {
-            "years": list(range(2020, 2030))
-            + list(range(2060, 2070))
-            + list(range(2080, 2090)),
+            "years": list(range(2019, 2030))
+            + list(range(2059, 2070))
+            + list(range(2079, 2090)),
             "scenarios": ["rcp85"],
             "realizations": list(range(3)),
         },
@@ -48,8 +48,8 @@ DATASETS = {
         "frequency": "daily",
         "subset": {
             "years": list(range(2020, 2030))
-            + list(range(2060, 2070))
-            + list(range(2080, 2090)),
+            + list(range(2059, 2070))
+            + list(range(2079, 2090)),
             "scenarios": ["sai"],
             "realizations": list(range(3)),
         },
@@ -62,8 +62,8 @@ DATASETS = {
         "frequency": "daily",
         "subset": {
             "years": list(range(2020, 2030))
-            + list(range(2060, 2070))
-            + list(range(2080, 2090)),
+            + list(range(2059, 2070))
+            + list(range(2079, 2090)),
             "scenarios": ["sai"],
             "realizations": list(range(3, 20)),
         },

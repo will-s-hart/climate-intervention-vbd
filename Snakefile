@@ -1,46 +1,48 @@
 DATASETS = {
     "arise_control": {
         "realizations": list(range(10)),
-        "year_ranges": ["2020-2029", "2060-2069"],
+        "year_ranges": ["2019-2029", "2059-2069"],
     },
     "arise_feedback": {
         "realizations": list(range(10)),
-        "year_ranges": ["2060-2069"],
+        "year_ranges": ["2059-2069"],
     },
     "glens_control": {
         "realizations": list(range(3)),
-        "year_ranges": ["2020-2029", "2060-2069", "2080-2089"],
+        "year_ranges": ["2019-2029", "2059-2069", "2079-2089"],
     },
     "glens_feedback": {
         "realizations": list(range(3)),
-        "year_ranges": ["2020-2029", "2060-2069", "2080-2089"],
+        "year_ranges": ["2020-2029", "2059-2069", "2079-2089"],
     },
     "glens_feedbackrest": {
         "realizations": list(range(3, 20)),
-        "year_ranges": ["2020-2029", "2060-2069", "2080-2089"],
+        "year_ranges": ["2020-2029", "2059-2069", "2079-2089"],
     },
 }
+EPI_MODELS = ["mordecai_ae_aegypti_niche", "kaye_ae_aegypti_niche"]
 
 
 def get_download_file(dataset, realization, year_range):
     return f"results/downloads/{dataset}_{realization}_{year_range}.txt"
 
 
-def get_result_file(dataset, realization):
-    return f"results/{dataset}_{realization}.nc"
+def get_result_file(dataset, realization, epi_model_name):
+    return f"results/{epi_model_name}/{dataset}_{realization}.nc"
 
 
 download_files = [
-    get_download_file(dataset, r, y)
+    get_download_file(dataset, realization, year_range)
     for dataset, meta in DATASETS.items()
-    for r in meta["realizations"]
-    for y in meta["year_ranges"]
+    for realization in meta["realizations"]
+    for year_range in meta["year_ranges"]
 ]
 
 result_files = [
-    get_result_file(dataset, r)
+    get_result_file(dataset, realization, epi_model_name)
     for dataset, meta in DATASETS.items()
-    for r in meta["realizations"]
+    for realization in meta["realizations"]
+    for epi_model_name in EPI_MODELS
 ]
 
 
@@ -83,10 +85,11 @@ rule run_epi_model:
         "scripts/inputs.py",
         "scripts/run_epi_model.py",
     output:
-        get_result_file("{dataset}", "{realization}"),
+        get_result_file("{dataset}", "{realization}", "{epi_model_name}"),
     shell:
         """
         pixi run python scripts/run_epi_model.py \
             --dataset {wildcards.dataset} \
-            --realizations {wildcards.realization}
+            --realizations {wildcards.realization} \
+            --epi-model-name {wildcards.epi_model_name}
         """

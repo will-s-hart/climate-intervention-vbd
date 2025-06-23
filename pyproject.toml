@@ -38,7 +38,6 @@ climepi = { git = "https://github.com/idm-oxford/climate-epidemics", branch = "g
 ruff = "*"
 ipykernel = "*"
 jupyter_bokeh = "*"
-python-dotenv = "*"
 snakemake = "*"
 snakemake-executor-plugin-slurm = "*"
 
