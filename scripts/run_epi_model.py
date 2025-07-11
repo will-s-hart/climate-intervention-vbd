@@ -23,9 +23,7 @@ def _run_epi_model(
     ).sel(realization=realizations)
     ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
     if epi_model_name == "kaye_ae_aegypti_niche":
-        ds_clim = _precipitation_rolling_average(
-            ds_clim, dataset=dataset, realizations=realizations
-        )
+        ds_clim = _precipitation_rolling_average(ds_clim)
     datasets = [
         ds_clim.sel(realization=[realization]).climepi.run_epi_model(
             epi_model, return_yearly_portion_suitable=True
@@ -39,20 +37,7 @@ def _run_epi_model(
         delayed_obj.compute()
 
 
-def _precipitation_rolling_average(ds_clim, dataset=None, realizations=None):
-    if dataset == "glens_feedback":
-        # 2019 values come from control run, so append them
-        ds_clim_2019 = (
-            xr.open_mfdataset(
-                str(DATASETS["glens_control"]["save_dir"] / "*.nc"),
-                data_vars="minimal",
-                chunks={},
-            )
-            .assign_coords(scenario=["sai"])
-            .sel(time="2019", realization=realizations)
-        )
-        ds_clim_2019.time_bnds.load()
-        ds_clim = xr.concat([ds_clim, ds_clim_2019], dim="time")
+def _precipitation_rolling_average(ds_clim):
     ds_clim = ds_clim.assign(
         precipitation=ds_clim["precipitation"].rolling(time=30).mean(),
     )
