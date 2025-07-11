@@ -311,8 +311,8 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.6.1-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-1.4.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-jobstep-0.3.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-report-plugins-1.1.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-storage-plugins-4.2.1-pyhdfd78af_0.tar.bz2
@@ -366,7 +366,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-1.3.1-hb9d3cd8_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h66e93f0_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       linux-aarch64:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/_openmp_mutex-4.5-2_gnu.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
@@ -670,8 +670,8 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.6.1-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-1.4.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-jobstep-0.3.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-report-plugins-1.1.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-storage-plugins-4.2.1-pyhdfd78af_0.tar.bz2
@@ -725,7 +725,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zlib-1.3.1-h86ecc28_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zstandard-0.23.0-py312hb2c0f52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zstd-1.5.7-hbcf94c1_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -1020,8 +1020,8 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.6.1-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-1.4.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-jobstep-0.3.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-report-plugins-1.1.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-storage-plugins-4.2.1-pyhdfd78af_0.tar.bz2
@@ -1075,7 +1075,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zlib-1.3.1-hd23fc13_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstandard-0.23.0-py312h01d7ebd_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h8210216_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -1369,8 +1369,8 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.6.1-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-1.4.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-jobstep-0.3.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-report-plugins-1.1.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-storage-plugins-4.2.1-pyhdfd78af_0.tar.bz2
@@ -1424,7 +1424,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zlib-1.3.1-h8359307_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.23.0-py312hea69d52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-h6491c7d_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -1708,8 +1708,8 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.6.1-hdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-1.4.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-executor-plugin-slurm-jobstep-0.3.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+      - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-report-plugins-1.1.0-pyhdfd78af_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-storage-plugins-4.2.1-pyhdfd78af_0.tar.bz2
@@ -1769,7 +1769,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zlib-1.3.1-h2466b09_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py312h4389bb4_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-hbeecb71_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
   prod:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -2043,7 +2043,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-1.3.1-hb9d3cd8_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.23.0-py312h66e93f0_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb8e6e7a_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       linux-aarch64:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/_openmp_mutex-4.5-2_gnu.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
@@ -2309,7 +2309,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zlib-1.3.1-h86ecc28_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zstandard-0.23.0-py312hb2c0f52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/zstd-1.5.7-hbcf94c1_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -2565,7 +2565,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zlib-1.3.1-hd23fc13_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstandard-0.23.0-py312h01d7ebd_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h8210216_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -2820,7 +2820,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zlib-1.3.1-h8359307_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.23.0-py312hea69d52_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-h6491c7d_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiobotocore-2.23.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/aiohappyeyeballs-2.6.1-pyhd8ed1ab_0.conda
@@ -3070,7 +3070,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zlib-1.3.1-h2466b09_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.23.0-py312h4389bb4_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-hbeecb71_2.conda
-      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+      - pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -3368,6 +3368,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 122993
   timestamp: 1750291448852
@@ -3382,6 +3383,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-io >=0.20.1,<0.20.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 129524
   timestamp: 1750291488278
@@ -3396,6 +3398,7 @@ packages:
   - aws-c-http >=0.10.2,<0.10.3.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 110566
   timestamp: 1750291407385
@@ -3410,6 +3413,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-sdkutils >=0.2.4,<0.2.5.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 106828
   timestamp: 1750291414287
@@ -3429,6 +3433,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-sdkutils >=0.2.4,<0.2.5.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 115868
   timestamp: 1750291419402
@@ -3617,6 +3622,7 @@ packages:
   - aws-checksums >=0.2.7,<0.2.8.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 57252
   timestamp: 1750287878861
@@ -3631,6 +3637,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-checksums >=0.2.7,<0.2.8.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 60112
   timestamp: 1750287914924
@@ -3644,6 +3651,7 @@ packages:
   - aws-c-io >=0.20.1,<0.20.2.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 51173
   timestamp: 1750287887384
@@ -3657,6 +3665,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-checksums >=0.2.7,<0.2.8.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 50678
   timestamp: 1750287918055
@@ -3674,6 +3683,7 @@ packages:
   - aws-checksums >=0.2.7,<0.2.8.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 55990
   timestamp: 1750287899566
@@ -3688,6 +3698,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-compression >=0.3.1,<0.3.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 223038
   timestamp: 1750289165728
@@ -3701,6 +3712,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 210024
   timestamp: 1750289206854
@@ -3714,6 +3726,7 @@ packages:
   - aws-c-compression >=0.3.1,<0.3.2.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 190693
   timestamp: 1750289167421
@@ -3727,6 +3740,7 @@ packages:
   - aws-c-compression >=0.3.1,<0.3.2.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 169457
   timestamp: 1750289178320
@@ -3745,6 +3759,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 204438
   timestamp: 1750289208536
@@ -3826,6 +3841,7 @@ packages:
   - aws-c-io >=0.20.1,<0.20.2.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 215867
   timestamp: 1750291920145
@@ -3838,6 +3854,7 @@ packages:
   - aws-c-http >=0.10.2,<0.10.3.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 189458
   timestamp: 1750291964588
@@ -3850,6 +3867,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-c-io >=0.20.1,<0.20.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 187226
   timestamp: 1750291914810
@@ -3862,6 +3880,7 @@ packages:
   - aws-c-io >=0.20.1,<0.20.2.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 149876
   timestamp: 1750291922527
@@ -3879,6 +3898,7 @@ packages:
   - aws-c-http >=0.10.2,<0.10.3.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 206081
   timestamp: 1750291938128
@@ -3896,6 +3916,7 @@ packages:
   - aws-c-auth >=0.9.0,<0.9.1.0a0
   - aws-c-common >=0.12.3,<0.12.4.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 133890
   timestamp: 1750296132782
@@ -3912,6 +3933,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-io >=0.20.1,<0.20.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 138147
   timestamp: 1750296154550
@@ -3927,6 +3949,7 @@ packages:
   - aws-c-auth >=0.9.0,<0.9.1.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 120140
   timestamp: 1750296149033
@@ -3942,6 +3965,7 @@ packages:
   - aws-c-common >=0.12.3,<0.12.4.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 116630
   timestamp: 1750296134288
@@ -3962,6 +3986,7 @@ packages:
   - aws-c-http >=0.10.2,<0.10.3.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 126859
   timestamp: 1750296162945
@@ -4105,6 +4130,7 @@ packages:
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   - aws-c-io >=0.20.1,<0.20.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 395108
   timestamp: 1750299573047
@@ -4124,6 +4150,7 @@ packages:
   - aws-c-mqtt >=0.13.1,<0.13.2.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 315583
   timestamp: 1750299622097
@@ -4143,6 +4170,7 @@ packages:
   - aws-c-auth >=0.9.0,<0.9.1.0a0
   - aws-c-io >=0.20.1,<0.20.2.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 338240
   timestamp: 1750299593931
@@ -4162,6 +4190,7 @@ packages:
   - aws-c-mqtt >=0.13.1,<0.13.2.0a0
   - aws-c-sdkutils >=0.2.4,<0.2.5.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 262498
   timestamp: 1750299613037
@@ -4185,6 +4214,7 @@ packages:
   - aws-c-s3 >=0.8.1,<0.8.2.0a0
   - aws-c-cal >=0.9.2,<0.9.3.0a0
   license: Apache-2.0
+  license_family: APACHE
   purls: []
   size: 294630
   timestamp: 1750299602043
@@ -5243,6 +5273,7 @@ packages:
   - python >=3.10
   - xarray >=2023.09.0
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/cf-xarray?source=hash-mapping
   size: 63678
@@ -5436,9 +5467,9 @@ packages:
   - pkg:pypi/click?source=compressed-mapping
   size: 88117
   timestamp: 1747811467132
-- pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#4ecd4e97293aadfc32ca9196d23179f378637549
+- pypi: git+https://github.com/idm-oxford/climate-epidemics?branch=geoengineering#d35962395df80d6a5958991e927bff9995d42d71
   name: climepi
-  version: 0.5.3+71.g4ecd4e9
+  version: 0.5.3+72.gd359623
   requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/conda-forge/noarch/cloudpickle-3.1.1-pyhd8ed1ab_0.conda
   sha256: 21ecead7268241007bf65691610cd7314da68c1f88113092af690203b5780db5
@@ -8883,6 +8914,7 @@ packages:
   - blas 2.132   openblas
   - liblapack  3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17330
   timestamp: 1750388798074
@@ -8900,6 +8932,7 @@ packages:
   - liblapacke 3.9.0   32*_openblas
   - mkl <2025
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17341
   timestamp: 1750388911474
@@ -8917,6 +8950,7 @@ packages:
   - liblapacke 3.9.0   32*_openblas
   - libcblas   3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17571
   timestamp: 1750389030403
@@ -8934,6 +8968,7 @@ packages:
   - libcblas   3.9.0   32*_openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17520
   timestamp: 1750388963178
@@ -8949,6 +8984,7 @@ packages:
   - liblapacke 3.9.0   32*_mkl
   - blas 2.132   mkl
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 3735390
   timestamp: 1750389080409
@@ -9132,6 +9168,7 @@ packages:
   - liblapack  3.9.0   32*_openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17308
   timestamp: 1750388809353
@@ -9146,6 +9183,7 @@ packages:
   - blas 2.132   openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17335
   timestamp: 1750388919351
@@ -9160,6 +9198,7 @@ packages:
   - liblapack  3.9.0   32*_openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17574
   timestamp: 1750389040732
@@ -9174,6 +9213,7 @@ packages:
   - liblapack  3.9.0   32*_openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17485
   timestamp: 1750388970626
@@ -9188,6 +9228,7 @@ packages:
   - liblapacke 3.9.0   32*_mkl
   - blas 2.132   mkl
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 3735392
   timestamp: 1750389122586
@@ -10344,6 +10385,7 @@ packages:
   - blas 2.132   openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17316
   timestamp: 1750388820745
@@ -10358,6 +10400,7 @@ packages:
   - blas 2.132   openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17308
   timestamp: 1750388926844
@@ -10372,6 +10415,7 @@ packages:
   - liblapacke 3.9.0   32*_openblas
   - libcblas   3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17553
   timestamp: 1750389051033
@@ -10386,6 +10430,7 @@ packages:
   - libcblas   3.9.0   32*_openblas
   - liblapacke 3.9.0   32*_openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17507
   timestamp: 1750388977861
@@ -10400,6 +10445,7 @@ packages:
   - liblapacke 3.9.0   32*_mkl
   - blas 2.132   mkl
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 3735534
   timestamp: 1750389164366
@@ -10414,6 +10460,7 @@ packages:
   constrains:
   - blas 2.132   openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17316
   timestamp: 1750388832284
@@ -10428,6 +10475,7 @@ packages:
   constrains:
   - blas 2.132   openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17344
   timestamp: 1750388934792
@@ -10442,6 +10490,7 @@ packages:
   constrains:
   - blas 2.132   openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17577
   timestamp: 1750389063059
@@ -10456,6 +10505,7 @@ packages:
   constrains:
   - blas 2.132   openblas
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 17549
   timestamp: 1750388985274
@@ -10730,6 +10780,7 @@ packages:
   constrains:
   - openblas >=0.3.30,<0.3.31.0a0
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 5916819
   timestamp: 1750379877844
@@ -10743,6 +10794,7 @@ packages:
   constrains:
   - openblas >=0.3.30,<0.3.31.0a0
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 4960761
   timestamp: 1750379264152
@@ -10757,6 +10809,7 @@ packages:
   constrains:
   - openblas >=0.3.30,<0.3.31.0a0
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 6179547
   timestamp: 1750380498501
@@ -10771,6 +10824,7 @@ packages:
   constrains:
   - openblas >=0.3.30,<0.3.31.0a0
   license: BSD-3-Clause
+  license_family: BSD
   purls: []
   size: 4163399
   timestamp: 1750378829050
@@ -12675,6 +12729,7 @@ packages:
   - python >=3.12,<3.13.0a0
   - python_abi 3.12.* *_cp312
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/multidict?source=compressed-mapping
   size: 94456
@@ -12688,6 +12743,7 @@ packages:
   - python >=3.12,<3.13.0a0 *_cpython
   - python_abi 3.12.* *_cp312
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/multidict?source=hash-mapping
   size: 95870
@@ -12700,6 +12756,7 @@ packages:
   - python >=3.12,<3.13.0a0
   - python_abi 3.12.* *_cp312
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/multidict?source=hash-mapping
   size: 87608
@@ -12713,6 +12770,7 @@ packages:
   - python >=3.12,<3.13.0a0 *_cpython
   - python_abi 3.12.* *_cp312
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/multidict?source=hash-mapping
   size: 86769
@@ -12727,6 +12785,7 @@ packages:
   - vc >=14.2,<15
   - vc14_runtime >=14.29.30139
   license: Apache-2.0
+  license_family: APACHE
   purls:
   - pkg:pypi/multidict?source=compressed-mapping
   size: 87384
@@ -12761,6 +12820,7 @@ packages:
   - python >=3.9
   - python
   license: MIT
+  license_family: MIT
   purls:
   - pkg:pypi/narwhals?source=compressed-mapping
   size: 230314
@@ -15042,6 +15102,7 @@ packages:
   depends:
   - python >=3.9
   license: BSD-2-Clause
+  license_family: BSD
   purls:
   - pkg:pypi/pygments?source=compressed-mapping
   size: 889287
@@ -15199,6 +15260,7 @@ packages:
   constrains:
   - pytest-faulthandler >=2
   license: MIT
+  license_family: MIT
   purls:
   - pkg:pypi/pytest?source=hash-mapping
   size: 276562
@@ -16306,9 +16368,9 @@ packages:
   - pkg:pypi/snakemake-executor-plugin-slurm-jobstep?source=hash-mapping
   size: 12881
   timestamp: 1739611671448
-- conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.18.0-pyhdfd78af_0.tar.bz2
-  sha256: 08cee91b74e147e7c3fb18303035f92fdf10df13ae73b04a78739b460948a466
-  md5: 3f4adb80d1d4f61425d4b775f382e268
+- conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-common-1.19.4-pyhdfd78af_0.tar.bz2
+  sha256: 55bd635264561325bac15189a51b75d384c9ca5090887c15f64af22f1608732a
+  md5: 0903b8c5f67ffb75f4b56012cad82f4f
   depends:
   - argparse-dataclass >=2.0.0,<3.0.0
   - configargparse >=1.7,<2.0
@@ -16317,22 +16379,22 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/snakemake-interface-common?source=hash-mapping
-  size: 18545
-  timestamp: 1747305547766
-- conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.6-pyhdfd78af_0.tar.bz2
-  sha256: d6b242bfb9987ddbb8c771c05cae45e8ae6cd7ad1db623f34cd13a72a59500ce
-  md5: 9763f9b90b0a90b0865831b43e479a2c
+  size: 19978
+  timestamp: 1750681398855
+- conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-executor-plugins-9.3.7-pyhdfd78af_0.tar.bz2
+  sha256: 70f7dd3ab1685bf27d86e9ff7900656751056503734472616c5d840c637df266
+  md5: f54fd47c15198486efe5ceb35d556216
   depends:
   - argparse-dataclass >=2.0.0,<3.0.0
   - python >=3.11.0,<4.0.0
-  - snakemake-interface-common >=1.17.4,<2.0.0
+  - snakemake-interface-common >=1.19.0
   - throttler >=1.2.2,<2.0.0
   license: MIT
   license_family: MIT
   purls:
   - pkg:pypi/snakemake-interface-executor-plugins?source=hash-mapping
-  size: 22916
-  timestamp: 1750245236198
+  size: 22834
+  timestamp: 1750715329449
 - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-interface-logger-plugins-1.2.3-pyhdfd78af_0.tar.bz2
   sha256: 156579df920ecc5c275dc4e94b595e0b8ce97f9f037631515e1b19c0652e1f88
   md5: de9701be8653cc2442f32fa76c08da61
