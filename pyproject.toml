@@ -17,7 +17,7 @@ geoviews = "*"
 h5netcdf = "*"
 hvplot = "*"
 intake-esm = "*"
-kerchunk = "*"
+kerchunk = "<0.2.8"              # https://github.com/fsspec/kerchunk/issues/566
 nc-time-axis = "*"
 numpy = "*"
 pandas = "*"
@@ -28,8 +28,9 @@ requests = "*"
 s3fs = ">=2021.4"
 siphon = "*"
 urllib3 = "*"
-xarray = "!=2024.10.0"
+xarray = "!=2025.7.0,!=2025.7.1" # https://github.com/pydata/xarray/issues/10536
 xcdat = "*"
+zarr = "<3"                      # https://github.com/fsspec/kerchunk/issues/566
 
 [tool.pixi.pypi-dependencies]
 climepi = { git = "https://github.com/idm-oxford/climate-epidemics", branch = "geoengineering" }
