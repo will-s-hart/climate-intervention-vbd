@@ -24,8 +24,7 @@ DATASETS = {
         "data_source": "arise",
         "frequency": "daily",
         "subset": {
-            "years": list(range(2024, 2035))
-            + list(range(2035, 2045))
+            "years": list(range(2035, 2045))
             + list(range(2045, 2055))
             + list(range(2055, 2065)),
             "scenarios": ["sai15"],

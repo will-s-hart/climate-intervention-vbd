@@ -12,7 +12,6 @@ DATASETS = {
     "arise_feedback": {
         "realizations": list(range(10)),
         "year_ranges": [
-            "2024-2034",
             "2035-2044",
             "2045-2054",
             "2055-2064",
