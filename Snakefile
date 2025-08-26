@@ -1,23 +1,20 @@
 DATASETS = {
     "arise_control": {
         "realizations": list(range(10)),
-        "year_ranges": ["2019-2029", "2059-2069"],
+        "year_ranges": [
+            "2024-2034",
+            "2035-2044",
+            "2045-2054",
+            "2055-2064",
+        ],
     },
     "arise_feedback": {
         "realizations": list(range(10)),
-        "year_ranges": ["2059-2069"],
-    },
-    "glens_control": {
-        "realizations": list(range(3)),
-        "year_ranges": ["2019-2029", "2059-2069", "2079-2089"],
-    },
-    "glens_feedback": {
-        "realizations": list(range(3)),
-        "year_ranges": ["2020-2029", "2059-2069", "2079-2089"],
-    },
-    "glens_feedbackrest": {
-        "realizations": list(range(3, 20)),
-        "year_ranges": ["2020-2029", "2059-2069", "2079-2089"],
+        "year_ranges": [
+            "2035-2044",
+            "2045-2054",
+            "2055-2064",
+        ],
     },
 }
 EPI_MODELS = ["mordecai_ae_aegypti_niche", "kaye_ae_aegypti_niche"]
