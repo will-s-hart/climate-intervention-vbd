@@ -1,3 +1,4 @@
+import climepi  # noqa
 import holoviews as hv
 import numpy as np
 import xarray as xr
