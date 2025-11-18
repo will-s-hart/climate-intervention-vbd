@@ -1,9 +1,5 @@
 import pathlib
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 DATA_DIR = pathlib.Path(__file__).parents[1] / "data"
 
 DATASETS = {
