@@ -312,6 +312,65 @@ def make_example_plots(
     return plots
 
 
+def make_trend_plots(
+    ds_control=None,
+    ds_feedback=None,
+    location=None,
+    before_years=range(2025, 2035),
+    after_years=range(2035, 2045),
+    realizations=None,
+    save_path=None,
+    **kwargs,
+):
+    plot_kwargs = {
+        **PLOT_KWARGS,
+        **kwargs,
+    }
+    ds_before = (
+        ds_control.sel(time=ds_control.time.dt.year.isin(before_years))
+        .climepi.sel_geo(location)
+        .squeeze()
+    )
+    ds_control_after = (
+        ds_control.sel(time=ds_control.time.dt.year.isin(after_years))
+        .climepi.sel_geo(location)
+        .squeeze()
+    )
+    p_trend_list = []
+    realizations = realizations or ds_before.realization.values
+    for realization in realizations:
+        member_id = (
+            ds_before["member_id"].isel(realization=realization).compute().item()
+        )
+        ds_before_curr = ds_before.isel(realization=realization)
+        ds_before_curr_trend = ds_before_curr.climepi.ensemble_stats(deg=1).sel(
+            stat="mean", drop=True
+        )
+        ds_control_after_curr = ds_control_after.isel(realization=realization)
+        ds_control_after_curr_trend = ds_control_after_curr.climepi.ensemble_stats(
+            deg=1
+        ).sel(stat="mean", drop=True)
+        p_trend_list.append(
+            ds_before_curr.climepi.plot_time_series(
+                title=f"ID {member_id}",
+                color="black",
+                **plot_kwargs,
+            )
+            * ds_before_curr_trend.climepi.plot_time_series(color="blue", **plot_kwargs)
+            * ds_control_after_curr.climepi.plot_time_series(
+                color="black",
+                **plot_kwargs,
+            )
+            * ds_control_after_curr_trend.climepi.plot_time_series(
+                color="blue", **plot_kwargs
+            )
+        )
+    plots = hv.Layout(p_trend_list).opts(shared_axes=True).cols(3)
+    if save_path:
+        _save_fig(plots, save_path=save_path)
+    return plots
+
+
 def _save_fig(plots, save_path=None):
     hv.save(plots, f"{save_path}.png")
     hv.save(plots, f"{save_path}.html")
