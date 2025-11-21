@@ -1,44 +1,28 @@
-DATASETS = {
-    "arise_control": {
-        "realizations": list(range(10)),
-        "year_ranges": [
-            "2024-2034",
-            "2035-2044",
-            "2045-2054",
-            "2055-2064",
-        ],
-    },
-    "arise_feedback": {
-        "realizations": list(range(10)),
-        "year_ranges": [
-            "2035-2044",
-            "2045-2054",
-            "2055-2064",
-        ],
-    },
-}
-EPI_MODELS = ["mordecai_ae_aegypti_niche", "kaye_ae_aegypti_niche"]
+from src.inputs import DATASETS, EPI_MODEL_NAME
+
+EPI_MODELS = [EPI_MODEL_NAME]
 
 
-def get_download_file(dataset, realization, year_range):
-    return f"results/downloads/{dataset}_{realization}_{year_range}.txt"
+def get_download_file(dataset, realization, year):
+    return f"results/downloads/{dataset}_{realization}_{year}.txt"
 
 
-def get_result_file(dataset, realization, epi_model_name):
-    return f"results/{epi_model_name}/{dataset}_{realization}.nc"
+def get_result_file(dataset, realization, year, epi_model_name):
+    return f"results/{dataset}_{epi_model_name}/{realization}_{year}.nc"
 
 
 download_files = [
-    get_download_file(dataset, realization, year_range)
+    get_download_file(dataset, realization, year)
     for dataset, meta in DATASETS.items()
-    for realization in meta["realizations"]
-    for year_range in meta["year_ranges"]
+    for realization in meta["subset"]["realizations"]
+    for year in meta["subset"]["years"]
 ]
 
 result_files = [
-    get_result_file(dataset, realization, epi_model_name)
+    get_result_file(dataset, realization, year, epi_model_name)
     for dataset, meta in DATASETS.items()
-    for realization in meta["realizations"]
+    for realization in meta["subset"]["realizations"]
+    for year in meta["subset"]["years"]
     for epi_model_name in EPI_MODELS
 ]
 
@@ -60,33 +44,33 @@ rule results:
 
 rule download_data:
     input:
-        "scripts/inputs.py",
-        "scripts/download_data.py",
+        "src/inputs.py",
+        "src/download_data.py",
     output:
-        get_download_file("{dataset}", "{realization}", "{year_range}"),
+        get_download_file("{dataset}", "{realization}", "{year}"),
     shell:
         """
-        pixi run python scripts/download_data.py \
+        pixi run python src/download_data.py \
             --dataset {wildcards.dataset} \
-            --year-range {wildcards.year_range} \
+            --years {wildcards.year} \
             --realizations {wildcards.realization}
         """
 
 
 rule run_epi_model:
     input:
-        lambda wildcards: [
-            get_download_file(wildcards.dataset, wildcards.realization, y)
-            for y in DATASETS[wildcards.dataset]["year_ranges"]
-        ],
-        "scripts/inputs.py",
-        "scripts/run_epi_model.py",
+        lambda wildcards: get_download_file(
+            wildcards.dataset, wildcards.realization, wildcards.year
+        ),
+        "src/inputs.py",
+        "src/run_epi_model.py",
     output:
-        get_result_file("{dataset}", "{realization}", "{epi_model_name}"),
+        get_result_file("{dataset}", "{realization}", "{year}", "{epi_model_name}"),
     shell:
         """
-        pixi run python scripts/run_epi_model.py \
+        pixi run python src/run_epi_model.py \
             --dataset {wildcards.dataset} \
+            --years {wildcards.year} \
             --realizations {wildcards.realization} \
             --epi-model-name {wildcards.epi_model_name}
         """
