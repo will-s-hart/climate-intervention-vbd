@@ -44,9 +44,10 @@ if __name__ == "__main__":
     for realization in np.atleast_1d(args.realizations or "all"):
         for year in np.atleast_1d(args.years or "all"):
             download_confirmation_path = (
-                pathlib.Path(__file__).parents[1] / "results/downloads/"
-                f"{args.dataset}_{realization}_{year}"
-                ".txt"
+                pathlib.Path(__file__).parents[1]
+                / "results/downloads"
+                / args.dataset
+                / f"{realization}_{year}.txt"
             )
             download_confirmation_path.parent.mkdir(parents=True, exist_ok=True)
             with open(download_confirmation_path, "w", encoding="utf-8") as f:
