@@ -4,11 +4,27 @@ EPI_MODELS = [EPI_MODEL_NAME]
 
 
 def get_download_file(dataset, realization, year):
-    return f"results/downloads/{dataset}_{realization}_{year}.txt"
+    return f"results/downloads/{dataset}/{realization}_{year}.txt"
 
 
 def get_result_file(dataset, realization, year, epi_model_name):
-    return f"results/{dataset}_{epi_model_name}/{realization}_{year}.nc"
+    return f"results/{epi_model_name}/{dataset}/{realization}_{year}.nc"
+
+
+def get_figure_files(analysis):
+    return [
+        f"figures/{analysis}/{fig_name}.png"
+        for fig_name in [
+            "before_after_intervention_mean",
+            "before_after_intervention_icv_summary",
+            "before_after_intervention_icv_summary_max",
+            "before_after_intervention_icv_summary_threshold",
+            "before_after_intervention_individual_realizations",
+            "later_mean",
+            "later_icv_summary",
+            "trend_london",
+        ]
+    ]
 
 
 download_files = [
@@ -26,6 +42,10 @@ result_files = [
     for epi_model_name in EPI_MODELS
 ]
 
+figure_files = get_figure_files(analysis="downscaled") + get_figure_files(
+    analysis="native"
+)
+
 
 rule all:
     input:
@@ -40,6 +60,11 @@ rule downloads:
 rule results:
     input:
         result_files,
+
+
+rule figures:
+    input:
+        figure_files,
 
 
 rule download_data:
@@ -73,4 +98,18 @@ rule run_epi_model:
             --years {wildcards.year} \
             --realizations {wildcards.realization} \
             --epi-model-name {wildcards.epi_model_name}
+        """
+
+
+rule generate_figures:
+    input:
+        result_files,
+        "src/inputs.py",
+        "src/generate_figures.py",
+    output:
+        get_figure_files("{analysis}"),
+    shell:
+        """
+        pixi run python src/generate_figures.py \
+            --downscaled {True if wildcards.analysis == "downscaled" else False}
         """
