@@ -20,7 +20,7 @@ def _run_epi_model(
     if realizations is None:
         realizations = DATASETS[dataset]["subset"]["realizations"]
     realizations = np.atleast_1d(realizations)
-    save_dir = pathlib.Path(__file__).parents[1] / f"results/{dataset}_{epi_model_name}"
+    save_dir = pathlib.Path(__file__).parents[1] / f"results/{epi_model_name}/{dataset}"
     epi_model = epimod.get_example_model(epi_model_name)
     ds_clim = xr.open_mfdataset(
         str(DATASETS[dataset]["save_dir"] / "*.nc"),
@@ -34,17 +34,18 @@ def _run_epi_model(
     )
     ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
     datasets = [
-        ds_clim.sel(realization=[realization]).climepi.run_epi_model(
-            epi_model, return_yearly_portion_suitable=True
-        )
+        ds_clim.sel(realization=[realization])
+        .isel(time=ds_clim.time.dt.year.isin([year]))
+        .climepi.run_epi_model(epi_model, return_yearly_portion_suitable=True)
         for realization in realizations
+        for year in years
     ]
-    save_dir.mkdir(parents=True, exist_ok=True)
     paths = [
         save_dir / f"{realization}_{year}.nc"
         for realization in realizations
         for year in years
     ]
+    save_dir.mkdir(parents=True, exist_ok=True)
     delayed_obj = xr.save_mfdataset(datasets, paths, compute=False)
     with dask.diagnostics.ProgressBar():
         delayed_obj.compute()
