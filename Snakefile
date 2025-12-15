@@ -49,7 +49,7 @@ figure_files = get_figure_files(analysis="downscaled") + get_figure_files(
 
 rule all:
     input:
-        download_files + result_files,
+        download_files + result_files + figure_files,
 
 
 rule downloads:
@@ -101,15 +101,16 @@ rule run_epi_model:
         """
 
 
-rule generate_figures:
+rule make_figures:
     input:
         result_files,
         "src/inputs.py",
-        "src/generate_figures.py",
+        "src/make_figures.py",
+        "src/plotting_functions.py",
     output:
         get_figure_files("{analysis}"),
     shell:
         """
-        pixi run python src/generate_figures.py \
+        pixi run python src/make_figures.py \
             --downscaled {True if wildcards.analysis == "downscaled" else False}
         """
