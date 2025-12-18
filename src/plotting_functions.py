@@ -2,6 +2,15 @@ import climepi  # noqa
 import holoviews as hv
 import numpy as np
 import xarray as xr
+from bokeh.io import export_svg
+from selenium.webdriver import Firefox, FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
+WEBDRIVER_SERVICE = FirefoxService(GeckoDriverManager().install())
+WEBDRIVER_OPTIONS = FirefoxOptions()
+WEBDRIVER_OPTIONS.add_argument("--headless")
+
 
 PLOT_KWARGS = {"frame_width": 500}
 
@@ -372,5 +381,6 @@ def make_trend_plots(
 
 
 def _save_fig(plots, save_path=None):
-    hv.save(plots, f"{save_path}.png")
-    hv.save(plots, f"{save_path}.html")
+    with Firefox(options=WEBDRIVER_OPTIONS, service=WEBDRIVER_SERVICE) as driver:
+        bokeh_plots = hv.render(plots, backend="bokeh")
+        export_svg(bokeh_plots, filename=f"{save_path}.svg", webdriver=driver)
