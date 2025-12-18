@@ -13,16 +13,28 @@ from plotting_functions import (
 
 
 def _make_figures(downscaled=False):
-    save_dir = pathlib.Path(f"../figures/{'downscaled' if downscaled else 'native'}")
+    save_dir = (
+        pathlib.Path(__file__).parents[1]
+        / f"figures/{'downscaled' if downscaled else 'native'}"
+    )
+    save_dir.mkdir(parents=True, exist_ok=True)
     ds_control = xr.open_mfdataset(
-        f"../results/mordecai_ae_aegypti_niche/arise_control{'_downscaled_' if downscaled else '_'}/*.nc",
+        str(
+            pathlib.Path(__file__).parents[1]
+            / "results/mordecai_ae_aegypti_niche/arise_control"
+            f"{'_downscaled' if downscaled else ''}/*.nc"
+        ),
         chunks={},
         data_vars="minimal",
         coords="minimal",
         compat="override",
     )
     ds_feedback = xr.open_mfdataset(
-        f"../results/mordecai_ae_aegypti_niche/arise_feedback{'_downscaled_' if downscaled else '_'}/*.nc",
+        str(
+            pathlib.Path(__file__).parents[1]
+            / "results/mordecai_ae_aegypti_niche/arise_feedback"
+            f"{'_downscaled' if downscaled else ''}/*.nc"
+        ),
         chunks={},
         data_vars="minimal",
         coords="minimal",
