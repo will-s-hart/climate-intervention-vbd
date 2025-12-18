@@ -264,12 +264,8 @@ def make_example_plots(
                 "ARISE control simulations used to initialize feedback simulations."
             )
         realization_other = realization + 5
-        member_id = (
-            ds_before["member_id"].isel(realization=realization).compute().item()
-        )
-        member_id_other = (
-            ds_before["member_id"].isel(realization=realization_other).compute().item()
-        )
+        member_id = f"00{realization + 1}"
+        member_id_other = f"00{realization_other + 1}"
         p_ex_list.append(
             (
                 ds_control_after[["portion_suitable"]]
@@ -348,9 +344,7 @@ def make_trend_plots(
     p_trend_list = []
     realizations = realizations or ds_before.realization.values
     for realization in realizations:
-        member_id = (
-            ds_before["member_id"].isel(realization=realization).compute().item()
-        )
+        member_id = f"00{realization + 1}"
         ds_before_curr = ds_before.isel(realization=realization)
         ds_before_curr_trend = ds_before_curr.climepi.ensemble_stats(deg=1).sel(
             stat="mean", drop=True
