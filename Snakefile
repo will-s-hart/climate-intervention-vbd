@@ -13,16 +13,15 @@ def get_result_file(dataset, realization, year, epi_model_name):
 
 def get_figure_files(analysis):
     return [
-        f"figures/{analysis}/{fig_name}.png"
+        f"figures/{analysis}/{fig_name}.svg"
         for fig_name in [
-            "before_after_intervention_mean",
-            "before_after_intervention_icv_summary",
-            "before_after_intervention_icv_summary_max",
-            "before_after_intervention_icv_summary_threshold",
-            "before_after_intervention_individual_realizations",
-            "later_mean",
-            "later_icv_summary",
-            "trend_london",
+            "figure_1",
+            "figure_2",
+            "figure_S1",
+            "figure_S2",
+            "figure_S3",
+            "figure_S4",
+            "figure_S5",
         ]
     ]
 
@@ -109,8 +108,9 @@ rule make_figures:
         "src/plotting_functions.py",
     output:
         get_figure_files("{analysis}"),
+    params:
+        opts=lambda wildcards: (
+            "--downscaled" if wildcards.analysis == "downscaled" else ""
+        ),
     shell:
-        """
-        pixi run python src/make_figures.py \
-            --downscaled {True if wildcards.analysis == "downscaled" else False}
-        """
+        "pixi run python src/make_figures.py {params.opts}"

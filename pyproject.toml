@@ -13,6 +13,7 @@ numpy = "*"
 selenium = "*"
 snakemake = "*"
 snakemake-executor-plugin-slurm = "*"
+svgutils = "*"
 xarray = "*"
 webdriver-manager = "*"
 
