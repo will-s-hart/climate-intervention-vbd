@@ -42,19 +42,19 @@ def make_figure_panels(downscaled=False):
         coords="minimal",
         compat="override",
     )
-    # Fig 1 panels
-    make_mean_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        save_base_path=save_dir / "mean",
-    )
-    # Fig 2 panels
-    make_change_example_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        realizations=[0, 5],
-        save_base_path=save_dir / "change_example",
-    )
+    # # Fig 1 panels
+    # make_mean_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     save_base_path=save_dir / "mean",
+    # )
+    # # Fig 2 panels
+    # make_change_example_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     realizations=[0, 5],
+    #     save_base_path=save_dir / "change_example",
+    # )
     make_location_example_plots(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
@@ -63,28 +63,28 @@ def make_figure_panels(downscaled=False):
         panel_labels=["C"],
         save_base_path=save_dir / "location_london",
     )
-    # Fig S1 panels
-    make_mean_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        after_years=range(2045, 2055),
-        panel_labels=["", "A", "B", "C"],
-        save_base_path=save_dir / "later_mean",
-    )
-    make_mean_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        after_years=range(2055, 2065),
-        panel_labels=["", "D", "E", "F"],
-        save_base_path=save_dir / "even_later_mean",
-    )
-    # Fig S2 panels
-    make_change_example_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        realizations=[1, 6, 2, 7, 3, 8, 4, 9],
-        save_base_path=save_dir / "change_example_others",
-    )
+    # # Fig S1 panels
+    # make_mean_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     after_years=range(2045, 2055),
+    #     panel_labels=["", "A", "B", "C"],
+    #     save_base_path=save_dir / "later_mean",
+    # )
+    # make_mean_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     after_years=range(2055, 2065),
+    #     panel_labels=["", "D", "E", "F"],
+    #     save_base_path=save_dir / "even_later_mean",
+    # )
+    # # Fig S2 panels
+    # make_change_example_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     realizations=[1, 6, 2, 7, 3, 8, 4, 9],
+    #     save_base_path=save_dir / "change_example_others",
+    # )
     # Fig S3 panels
     make_location_example_plots(
         ds_control=ds_control,
@@ -117,22 +117,21 @@ def make_figure_panels(downscaled=False):
         realizations=[1, 2, 3, 4],
         save_base_path=save_dir / "location_london_others",
     )
-    # Fig S5 panels
-    make_trend_example_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        save_base_path=save_dir / "trend_example",
-    )
-    # Fig S6 panels
-    make_change_summary_plots(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        save_path=save_dir / "change_summary",
-    )
-    make_trend_summary_plots(
-        ds_feedback=ds_feedback,
-        save_base_path=save_dir / "trend_summary",
-    )
+    # # Fig S5 panels
+    # make_trend_example_plots(
+    #     ds_feedback=ds_feedback,
+    #     save_base_path=save_dir / "trend_example",
+    # )
+    # # Fig S6 panels
+    # make_change_summary_plots(
+    #     ds_control=ds_control,
+    #     ds_feedback=ds_feedback,
+    #     save_base_path=save_dir / "change_summary",
+    # )
+    # make_trend_summary_plots(
+    #     ds_feedback=ds_feedback,
+    #     save_base_path=save_dir / "trend_summary",
+    # )
 
 
 def compile_figures(downscaled=False):
@@ -157,13 +156,24 @@ def compile_figures(downscaled=False):
             save_dir / "panels/change_example_ID_001.svg",
             save_dir / "panels/change_example_ID_006.svg",
             save_dir / "panels/location_london_ID_001.svg",
-            save_dir / "panels/location_london_ID_006.svg",
         ],
         save_path=save_dir / "figure_2.svg",
         panel_height=310,
-        tiling=(2, 2),
-        offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
+        tiling=(1, 3),
+        # offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
     )
+    # _combine_panels(
+    #     panel_paths=[
+    #         save_dir / "panels/change_example_ID_001.svg",
+    #         save_dir / "panels/change_example_ID_006.svg",
+    #         save_dir / "panels/location_london_ID_001.svg",
+    #         save_dir / "panels/location_london_ID_006.svg",
+    #     ],
+    #     save_path=save_dir / "figure_2.svg",
+    #     panel_height=310,
+    #     tiling=(2, 2),
+    #     offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
+    # )
     # Figure S1
     _combine_panels(
         panel_paths=[
@@ -196,14 +206,11 @@ def compile_figures(downscaled=False):
     _combine_panels(
         panel_paths=[
             save_dir / "panels/location_new_york_ID_001.svg",
-            save_dir / "panels/location_new_york_ID_006.svg",
             save_dir / "panels/location_rome_ID_001.svg",
-            save_dir / "panels/location_rome_ID_006.svg",
             save_dir / "panels/location_islamabad_ID_001.svg",
-            save_dir / "panels/location_islamabad_ID_006.svg",
         ],
         save_path=save_dir / "figure_S3.svg",
-        tiling=(2, 3),
+        tiling=(1, 3),
         panel_height=330,
     )
     # Figure S4
