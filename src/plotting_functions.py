@@ -248,7 +248,7 @@ def make_change_summary_plots(
         ds_increase = ds_mean_change >= threshold
         percent_increase = 100 * ds_increase.mean(dim="realization")
         p_curr = percent_increase.climepi.plot_map(
-            title=f"{panel_label}. Increase in days suitable "
+            title=f"{panel_label}. Increase in mean days suitable "
             f"({after_years.start}-{after_years.stop - 1} vs "
             f"{before_years.start}-{before_years.stop - 1}, {threshold} day threshold)",
             clabel="Percentage of ensemble members",
