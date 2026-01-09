@@ -286,7 +286,7 @@ def make_trend_example_plots(
     if panel_labels is None:
         panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(realizations)]
     ds_feedback_after = ds_feedback.sel(
-        time=ds_feedback.time.dt.year.isin(after_years), realization=list(realizations)
+        time=ds_feedback.time.dt.year.isin(after_years), realization=realizations
     ).squeeze()
     ds_after_trend = (
         ds_feedback_after.rename(realization="realization_")
@@ -372,10 +372,10 @@ def make_trend_summary_plots(
 def make_location_example_plots(
     ds_control=None,
     ds_feedback=None,
-    location=None,
+    locations=None,
     before_years=range(2025, 2035),
     after_years=range(2035, 2045),
-    realizations=None,
+    highlight_realization=None,
     panel_labels=None,
     save_base_path=None,
     **plot_kwargs,
@@ -386,74 +386,96 @@ def make_location_example_plots(
         "xlabel": "Year",
         "ylabel": "Days suitable for transmission",
     }
-    if location is None:
-        raise ValueError("location must be specified.")
-    if realizations is None:
-        realizations = [0, 1, 2, 3, 4]
+    if locations is None:
+        raise ValueError("locations must be specified.")
     if panel_labels is None:
-        panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(realizations)]
+        panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(locations)]
     colors = hv.Cycle().values
     ds_before = (
         ds_control.sel(time=ds_control.time.dt.year.isin(before_years))
-        .climepi.sel_geo(location)
         .squeeze()
+        .climepi.sel_geo(location=locations)
     )
     ds_before = ds_before.assign(time=ds_before.time.dt.year)  # avoids plotting issues
     ds_before_feedback_matched = _get_feedback_matched_before_dataset(ds_before)
     ds_feedback_after = (
         ds_feedback.sel(time=ds_feedback.time.dt.year.isin(after_years))
-        .climepi.sel_geo(location)
         .squeeze()
+        .climepi.sel_geo(location=locations)
     )
     ds_feedback_after = ds_feedback_after.assign(
         time=ds_feedback_after.time.dt.year  # avoids plotting issues
     )
     p_trend_list = []
-    for realization, panel_label in zip(realizations, panel_labels):
-        ds_before_curr = ds_before_feedback_matched.sel(realization=realization)
-        ds_before_curr_trend = ds_before_curr.climepi.ensemble_stats(deg=1).sel(
-            stat="mean", drop=True
+    for location, panel_label in zip(locations, panel_labels):
+        p_curr = hv.VLine(ds_feedback_after.time.values[0]).opts(
+            line_color="black", line_dash="dashed"
         )
-        realization_pair = [realization, (realization + 5) % 10]
-        member_id_pair = [f"{x + 1:03d}" for x in realization_pair]
-        p_curr = (
-            ds_before_curr.climepi.plot_time_series(color="black", **plot_kwargs).opts(
-                title=f"{panel_label}. {location}, IDs {' and '.join(member_id_pair)}",
-                **plot_opts,
+        for realization in range(5):
+            ds_before_curr = ds_before_feedback_matched.sel(
+                location=location, realization=realization
             )
-            * ds_before_curr_trend.climepi.plot_time_series(
-                color="black", line_dash="dashed", **plot_kwargs
+            ds_before_curr_trend = ds_before_curr.climepi.ensemble_stats(deg=1).sel(
+                stat="mean", drop=True
             )
-            * hv.VLine(ds_feedback_after.time.values[0]).opts(line_color="grey")
-        )
-        for realization_, member_id_, color in zip(
-            realization_pair, member_id_pair, [colors[0], colors[1]]
-        ):
-            ds_feedback_after_curr = ds_feedback_after.sel(realization=realization_)
-            ds_feedback_after_curr_trend = (
-                ds_feedback_after_curr.climepi.ensemble_stats(deg=1).sel(
-                    stat="mean", drop=True
-                )
-            )
-            p_curr *= xr.concat(
-                [ds_before_curr.isel(time=-1), ds_feedback_after_curr],
-                dim="time",
-                data_vars="minimal",
-                coords="minimal",
-                compat="override",
-            ).climepi.plot_time_series(
-                label=f"ID {member_id_}",
-                color=color,
+            realization_pair = [realization, (realization + 5) % 10]
+            member_id_pair = [f"{x + 1:03d}" for x in realization_pair]
+            highlight = highlight_realization in realization_pair
+            before_plot_kwargs = {
                 **plot_kwargs,
-            ) * ds_feedback_after_curr_trend.climepi.plot_time_series(
-                color=color, line_dash="dashed", **plot_kwargs
-            )
+                "color": colors[6] if highlight else "grey",
+                **({"line_width": 1, "alpha": 0.75} if not highlight else {}),
+            }
+            p_curr *= ds_before_curr.climepi.plot_time_series(
+                **before_plot_kwargs
+            ).opts(title=f"{panel_label}. {location}", **plot_opts)
+            if highlight:
+                p_curr *= ds_before_curr_trend.climepi.plot_time_series(
+                    line_dash="dashed", **before_plot_kwargs
+                )
+            for realization_, member_id_, color in zip(
+                realization_pair,
+                member_id_pair,
+                ([colors[0], colors[1]] if highlight else ["grey", "grey"]),
+            ):
+                ds_feedback_after_curr = ds_feedback_after.sel(
+                    realization=realization_, location=location
+                )
+                ds_feedback_after_curr_trend = (
+                    ds_feedback_after_curr.climepi.ensemble_stats(deg=1).sel(
+                        stat="mean", drop=True
+                    )
+                )
+                after_plot_kwargs = {
+                    **plot_kwargs,
+                    "color": color,
+                    **(
+                        {"line_width": 0.5}
+                        if not highlight
+                        else {"label": f"ID {member_id_}"}
+                    ),
+                }
+                p_curr *= xr.concat(
+                    [ds_before_curr.isel(time=-1), ds_feedback_after_curr],
+                    dim="time",
+                    data_vars="minimal",
+                    coords="minimal",
+                    compat="override",
+                ).climepi.plot_time_series(**after_plot_kwargs)
+                if highlight:
+                    after_trend_plot_kwargs = {
+                        "line_dash": "dashed",
+                        **{k: v for k, v in after_plot_kwargs.items() if k != "label"},
+                    }
+                    p_curr *= ds_feedback_after_curr_trend.climepi.plot_time_series(
+                        **after_trend_plot_kwargs
+                    )
+        p_curr.opts(legend_position="bottom_right")
         p_trend_list.append(p_curr)
     plots = hv.Layout(p_trend_list).opts(shared_axes=True).cols(2)
     if save_base_path:
-        for plot, realization in zip(plots, realizations):
-            member_id = f"{realization + 1:03d}"
-            save_path = f"{save_base_path}_ID_{member_id}.svg"
+        for plot, location in zip(plots, locations):
+            save_path = f"{save_base_path}_{location.lower().replace(' ', '_')}.svg"
             _save_fig(plot, save_path=save_path)
     return plots
 
