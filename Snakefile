@@ -1,6 +1,6 @@
-from src.inputs import DATASETS, EPI_MODEL_NAME
+from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME
 
-EPI_MODELS = [EPI_MODEL_NAME]
+EPI_MODELS = [EPI_MODEL_NAME, ALT_EPI_MODEL_NAME]
 
 
 def get_download_file(dataset, realization, year):
@@ -22,6 +22,8 @@ def get_figure_files(analysis):
             "figure_S3",
             "figure_S4",
             "figure_S5",
+            "figure_S6",
+            "figure_S7",
         ]
     ]
 
@@ -45,10 +47,32 @@ figure_files = get_figure_files(analysis="downscaled") + get_figure_files(
     analysis="native"
 )
 
+figure_files_png = [f.replace(".svg", ".png") for f in figure_files]
+
 
 rule all:
     input:
         download_files + result_files + figure_files,
+
+
+rule figures:
+    input:
+        figure_files,
+
+
+rule figures_png:
+    input:
+        figure_files,
+    output:
+        figure_files_png,
+    shell:
+        r"""
+        for svg in {input}; do
+            png="${{svg%.svg}}.png"
+            echo "Converting $svg -> $png"
+            inkscape "$svg" --export-type=png --export-filename="$png"
+        done
+        """
 
 
 rule downloads:
@@ -59,11 +83,6 @@ rule downloads:
 rule results:
     input:
         result_files,
-
-
-rule figures:
-    input:
-        figure_files,
 
 
 rule download_data:
