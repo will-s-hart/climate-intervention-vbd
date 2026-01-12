@@ -15,6 +15,8 @@ def _run_epi_model(
     realizations=None,
     epi_model_name=None,
 ):
+    if epi_model_name is None:
+        raise ValueError("epi_model_name must be provided.")
     if years is None:
         years = DATASETS[dataset]["subset"]["years"]
     if realizations is None:

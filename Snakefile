@@ -11,9 +11,27 @@ def get_result_file(dataset, realization, year, epi_model_name):
     return f"results/{epi_model_name}/{dataset}/{realization}_{year}.nc"
 
 
-def get_figure_files(analysis):
+def get_figure_data_files(epi_model_name, native_or_downscaled):
     return [
-        f"figures/{analysis}/{fig_name}.svg"
+        f"results/figure_data/{native_or_downscaled}/{epi_model_name}/{analysis}.nc"
+        for analysis in [
+            "mean",
+            "change_example",
+            "location",
+            "later_mean",
+            "even_later_mean",
+            "change_example_others",
+            "location",
+            "trend_example",
+            "change_summary",
+            "trend_summary",
+        ]
+    ]
+
+
+def get_figure_files(native_or_downscaled):
+    return [
+        f"figures/{native_or_downscaled}/{fig_name}.svg"
         for fig_name in [
             "figure_1",
             "figure_2",
@@ -43,19 +61,21 @@ result_files = [
     for epi_model_name in EPI_MODELS
 ]
 
-figure_files = get_figure_files(analysis="downscaled") + get_figure_files(
-    analysis="native"
+figure_data_files = [
+    file
+    for native_or_downscaled in ["native", "downscaled"]
+    for epi_model_name in EPI_MODELS
+    for file in get_figure_data_files(epi_model_name, native_or_downscaled)
+]
+
+figure_files = get_figure_files(native_or_downscaled="downscaled") + get_figure_files(
+    native_or_downscaled="native"
 )
 
 figure_files_png = [f.replace(".svg", ".png") for f in figure_files]
 
 
 rule all:
-    input:
-        download_files + result_files + figure_files,
-
-
-rule figures:
     input:
         figure_files,
 
@@ -119,17 +139,34 @@ rule run_epi_model:
         """
 
 
-rule make_figures:
+rule make_figure_data:
     input:
         result_files,
+        "src/make_figure_data.py",
+        "src/figure_data_functions.py",
+    output:
+        get_figure_data_files("{epi_model_name}", "{native_or_downscaled}"),
+    params:
+        opts=lambda wildcards: (
+            f"--downscaled --epi-model-name {wildcards.epi_model_name}"
+            if wildcards.native_or_downscaled == "downscaled"
+            else f"--epi-model-name {wildcards.epi_model_name}"
+        ),
+    shell:
+        "pixi run python src/make_figure_data.py {params.opts}"
+
+
+rule make_figures:
+    input:
+        figure_data_files,
         "src/inputs.py",
         "src/make_figures.py",
         "src/plotting_functions.py",
     output:
-        get_figure_files("{analysis}"),
+        get_figure_files("{native_or_downscaled}"),
     params:
         opts=lambda wildcards: (
-            "--downscaled" if wildcards.analysis == "downscaled" else ""
+            "--downscaled" if wildcards.native_or_downscaled == "downscaled" else ""
         ),
     shell:
         "pixi run python src/make_figures.py {params.opts}"
