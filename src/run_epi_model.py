@@ -6,14 +6,14 @@ import numpy as np
 import xarray as xr
 from climepi import epimod
 
-from inputs import DATASETS, EPI_MODEL_NAME
+from inputs import DATASETS
 
 
 def _run_epi_model(
     dataset=None,
     years=None,
     realizations=None,
-    epi_model_name=EPI_MODEL_NAME,
+    epi_model_name=None,
 ):
     if years is None:
         years = DATASETS[dataset]["subset"]["years"]
