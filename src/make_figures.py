@@ -4,6 +4,7 @@ import pathlib
 import svgutils.compose as svgc
 import xarray as xr
 
+from inputs import ALT_EPI_MODEL_NAME, EPI_MODEL_NAME
 from plotting_functions import (
     make_change_example_plots,
     make_change_summary_plots,
@@ -14,16 +15,16 @@ from plotting_functions import (
 )
 
 
-def make_figure_panels(downscaled=False):
+def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
     save_dir = (
         pathlib.Path(__file__).parents[1]
-        / f"figures/{'downscaled' if downscaled else 'native'}/panels"
+        / f"figures/{'downscaled' if downscaled else 'native'}/panels/{epi_model_name}"
     )
     save_dir.mkdir(parents=True, exist_ok=True)
     ds_control = xr.open_mfdataset(
         str(
             pathlib.Path(__file__).parents[1]
-            / "results/mordecai_ae_aegypti_niche/arise_control"
+            / f"results/{epi_model_name}/arise_control"
             f"{'_downscaled' if downscaled else ''}/*.nc"
         ),
         chunks={},
@@ -34,7 +35,7 @@ def make_figure_panels(downscaled=False):
     ds_feedback = xr.open_mfdataset(
         str(
             pathlib.Path(__file__).parents[1]
-            / "results/mordecai_ae_aegypti_niche/arise_feedback"
+            / f"results/{epi_model_name}/arise_feedback"
             f"{'_downscaled' if downscaled else ''}/*.nc"
         ),
         chunks={},
@@ -63,6 +64,8 @@ def make_figure_panels(downscaled=False):
         panel_labels=["C"],
         save_base_path=save_dir / "location",
     )
+    if main_only:
+        return
     # Fig S1 panels
     make_mean_plots(
         ds_control=ds_control,
@@ -119,106 +122,115 @@ def make_figure_panels(downscaled=False):
     )
 
 
-def compile_figures(downscaled=False):
+def compile_figures(
+    downscaled=False, epi_model_name=EPI_MODEL_NAME, main_only=True, figure_numbers=None
+):
     save_dir = (
         pathlib.Path(__file__).parents[1]
         / f"figures/{'downscaled' if downscaled else 'native'}"
     )
+    panel_dir = save_dir / "panels" / epi_model_name
+    if figure_numbers is None:
+        figure_numbers = [1, 2]
+        if not main_only:
+            figure_numbers += [f"S{i}" for i in range(1, 6)]
     # Figure 1
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/mean_before.svg",
-            save_dir / "panels/mean_without_intervention_minus_before.svg",
-            save_dir / "panels/mean_with_intervention_minus_before.svg",
-            save_dir / "panels/mean_with_minus_without_intervention.svg",
+            panel_dir / "mean_before.svg",
+            panel_dir / "mean_without_intervention_minus_before.svg",
+            panel_dir / "mean_with_intervention_minus_before.svg",
+            panel_dir / "mean_with_minus_without_intervention.svg",
         ],
-        save_path=save_dir / "figure_1.svg",
+        save_path=save_dir / f"figure_{figure_numbers[0]}.svg",
         tiling=(2, 2),
     )
     # Figure 2
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/change_example_ID_001.svg",
-            save_dir / "panels/change_example_ID_006.svg",
-            save_dir / "panels/location_london.svg",
+            panel_dir / "change_example_ID_001.svg",
+            panel_dir / "change_example_ID_006.svg",
+            panel_dir / "location_london.svg",
         ],
-        save_path=save_dir / "figure_2.svg",
+        save_path=save_dir / f"figure_{figure_numbers[1]}.svg",
         panel_height=310,
         tiling=(1, 3),
         # offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
     )
+    if main_only:
+        return
     # Figure S1
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/later_mean_without_intervention_minus_before.svg",
-            save_dir / "panels/later_mean_with_intervention_minus_before.svg",
-            save_dir / "panels/later_mean_with_minus_without_intervention.svg",
-            save_dir / "panels/even_later_mean_without_intervention_minus_before.svg",
-            save_dir / "panels/even_later_mean_with_intervention_minus_before.svg",
-            save_dir / "panels/even_later_mean_with_minus_without_intervention.svg",
+            panel_dir / "later_mean_without_intervention_minus_before.svg",
+            panel_dir / "later_mean_with_intervention_minus_before.svg",
+            panel_dir / "later_mean_with_minus_without_intervention.svg",
+            panel_dir / "even_later_mean_without_intervention_minus_before.svg",
+            panel_dir / "even_later_mean_with_intervention_minus_before.svg",
+            panel_dir / "even_later_mean_with_minus_without_intervention.svg",
         ],
-        save_path=save_dir / "figure_S1.svg",
+        save_path=save_dir / f"figure_{figure_numbers[2]}.svg",
         tiling=(3, 2),
     )
     # Figure S2
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/change_example_others_ID_002.svg",
-            save_dir / "panels/change_example_others_ID_007.svg",
-            save_dir / "panels/change_example_others_ID_003.svg",
-            save_dir / "panels/change_example_others_ID_008.svg",
-            save_dir / "panels/change_example_others_ID_004.svg",
-            save_dir / "panels/change_example_others_ID_009.svg",
-            save_dir / "panels/change_example_others_ID_005.svg",
-            save_dir / "panels/change_example_others_ID_010.svg",
+            panel_dir / "change_example_others_ID_002.svg",
+            panel_dir / "change_example_others_ID_007.svg",
+            panel_dir / "change_example_others_ID_003.svg",
+            panel_dir / "change_example_others_ID_008.svg",
+            panel_dir / "change_example_others_ID_004.svg",
+            panel_dir / "change_example_others_ID_009.svg",
+            panel_dir / "change_example_others_ID_005.svg",
+            panel_dir / "change_example_others_ID_010.svg",
         ],
-        save_path=save_dir / "figure_S2.svg",
+        save_path=save_dir / f"figure_{figure_numbers[3]}.svg",
         tiling=(2, 3),
     )
     # Figure S3
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/location_paris.svg",
-            save_dir / "panels/location_los_angeles.svg",
-            save_dir / "panels/location_santiago_de_chile.svg",
-            save_dir / "panels/location_addis_ababa.svg",
-            save_dir / "panels/location_new_delhi.svg",
-            save_dir / "panels/location_hanoi.svg",
-            save_dir / "panels/location_tokyo.svg",
-            save_dir / "panels/location_sydney.svg",
+            panel_dir / "location_paris.svg",
+            panel_dir / "location_los_angeles.svg",
+            panel_dir / "location_santiago_de_chile.svg",
+            panel_dir / "location_addis_ababa.svg",
+            panel_dir / "location_new_delhi.svg",
+            panel_dir / "location_hanoi.svg",
+            panel_dir / "location_tokyo.svg",
+            panel_dir / "location_sydney.svg",
         ],
-        save_path=save_dir / "figure_S3.svg",
+        save_path=save_dir / f"figure_{figure_numbers[4]}.svg",
         tiling=(2, 4),
         panel_height=330,
     )
     # Figure S4
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/trend_example_ID_001.svg",
-            save_dir / "panels/trend_example_ID_006.svg",
-            save_dir / "panels/trend_example_ID_002.svg",
-            save_dir / "panels/trend_example_ID_007.svg",
-            save_dir / "panels/trend_example_ID_003.svg",
-            save_dir / "panels/trend_example_ID_008.svg",
-            save_dir / "panels/trend_example_ID_004.svg",
-            save_dir / "panels/trend_example_ID_009.svg",
-            save_dir / "panels/trend_example_ID_005.svg",
-            save_dir / "panels/trend_example_ID_010.svg",
+            panel_dir / "trend_example_ID_001.svg",
+            panel_dir / "trend_example_ID_006.svg",
+            panel_dir / "trend_example_ID_002.svg",
+            panel_dir / "trend_example_ID_007.svg",
+            panel_dir / "trend_example_ID_003.svg",
+            panel_dir / "trend_example_ID_008.svg",
+            panel_dir / "trend_example_ID_004.svg",
+            panel_dir / "trend_example_ID_009.svg",
+            panel_dir / "trend_example_ID_005.svg",
+            panel_dir / "trend_example_ID_010.svg",
         ],
-        save_path=save_dir / "figure_S4.svg",
+        save_path=save_dir / f"figure_{figure_numbers[5]}.svg",
         tiling=(2, 5),
     )
     # Figure S5
     _combine_panels(
         panel_paths=[
-            save_dir / "panels/change_summary_threshold_1.svg",
-            save_dir / "panels/change_summary_threshold_15.svg",
-            save_dir / "panels/change_summary_threshold_30.svg",
-            save_dir / "panels/trend_summary_threshold_1.svg",
-            save_dir / "panels/trend_summary_threshold_15.svg",
-            save_dir / "panels/trend_summary_threshold_30.svg",
+            panel_dir / "change_summary_threshold_1.svg",
+            panel_dir / "change_summary_threshold_15.svg",
+            panel_dir / "change_summary_threshold_30.svg",
+            panel_dir / "trend_summary_threshold_1.svg",
+            panel_dir / "trend_summary_threshold_15.svg",
+            panel_dir / "trend_summary_threshold_30.svg",
         ],
-        save_path=save_dir / "figure_S5.svg",
+        save_path=save_dir / f"figure_{figure_numbers[6]}.svg",
         tiling=(3, 2),
     )
 
@@ -246,6 +258,23 @@ if __name__ == "__main__":
         action="store_true",
         help="Whether to generate figures for downscaled data.",
     )
+    parser.add_argument(
+        "--compile-only",
+        action="store_true",
+        help="Only compile figures from existing panels.",
+    )
     args = parser.parse_args()
-    make_figure_panels(downscaled=args.downscaled)
+    if not args.compile_only:
+        make_figure_panels(downscaled=args.downscaled, epi_model_name=EPI_MODEL_NAME)
+        make_figure_panels(
+            downscaled=args.downscaled,
+            epi_model_name=ALT_EPI_MODEL_NAME,
+            main_only=True,
+        )
     compile_figures(downscaled=args.downscaled)
+    compile_figures(
+        downscaled=args.downscaled,
+        epi_model_name=ALT_EPI_MODEL_NAME,
+        main_only=True,
+        figure_numbers=["S6", "S7"],
+    )

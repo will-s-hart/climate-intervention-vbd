@@ -41,3 +41,4 @@ DATASETS = {
     },
 }
 EPI_MODEL_NAME = "mordecai_ae_aegypti_niche"
+ALT_EPI_MODEL_NAME = "mordecai_ae_albopictus_niche"
