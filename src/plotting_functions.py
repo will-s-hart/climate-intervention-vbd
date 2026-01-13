@@ -382,4 +382,5 @@ def make_location_example_plots(
 def _save_fig(plot, save_path=None):
     with Firefox(options=WEBDRIVER_OPTIONS, service=WEBDRIVER_SERVICE) as driver:
         bokeh_plot = hv.render(plot, backend="bokeh")
+        bokeh_plot.sizing_mode = None  # stops warnings about width/height not being set
         export_svg(bokeh_plot, filename=save_path, webdriver=driver)

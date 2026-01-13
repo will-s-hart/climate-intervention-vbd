@@ -129,12 +129,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--downscaled",
         action="store_true",
-        help="Whether to generate figures for downscaled data.",
-    )
-    parser.add_argument(
-        "--compile-only",
-        action="store_true",
-        help="Only compile figures from existing panels.",
+        help="Whether to generate figure data for downscaled climate data.",
     )
     parser.add_argument(
         "--epi-model-name",
