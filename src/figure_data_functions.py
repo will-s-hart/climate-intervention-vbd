@@ -200,14 +200,14 @@ def make_location_example_plot_data(
         ds_control.sel(  # feedback realizations derived from 1st 5 control realizations
             time=ds_control.time.dt.year.isin(before_years), realization=list(range(5))
         )
-        .drop_vars("member_id")
+        .drop_vars("member_id", errors="ignore")
         .squeeze(drop=True)
         .climepi.sel_geo(location=locations)
     )
     ds_before = ds_before.assign(time=ds_before.time.dt.year)  # avoids plotting issues
     ds_feedback_after = (
         ds_feedback.sel(time=ds_feedback.time.dt.year.isin(after_years))
-        .drop_vars("member_id")
+        .drop_vars("member_id", errors="ignore")
         .squeeze(drop=True)
         .climepi.sel_geo(location=locations)
     )
