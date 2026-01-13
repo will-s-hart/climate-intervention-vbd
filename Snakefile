@@ -1,6 +1,11 @@
+import re
 from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME
 
 EPI_MODELS = [EPI_MODEL_NAME, ALT_EPI_MODEL_NAME]
+
+
+wildcard_constraints:
+    epi_model_name="|".join(re.escape(m) for m in EPI_MODELS),
 
 
 def get_download_file(dataset, realization, year):
@@ -21,7 +26,7 @@ def get_figure_data_files(epi_model_name, native_or_downscaled):
             "later_mean",
             "even_later_mean",
             "change_example_others",
-            "location",
+            "location_others",
             "trend_example",
             "change_summary",
             "trend_summary",
@@ -141,7 +146,15 @@ rule run_epi_model:
 
 rule make_figure_data:
     input:
-        result_files,
+        lambda wildcards: [
+            file
+            for file in result_files
+            if wildcards.epi_model_name in file
+            and (
+                ("downscaled" in file)
+                == (wildcards.native_or_downscaled == "downscaled")
+            )
+        ],
         "src/make_figure_data.py",
         "src/figure_data_functions.py",
     output:
@@ -158,7 +171,11 @@ rule make_figure_data:
 
 rule make_figures:
     input:
-        figure_data_files,
+        lambda wildcards: [
+            file
+            for file in figure_data_files
+            if (wildcards.native_or_downscaled in file)
+        ],
         "src/inputs.py",
         "src/make_figures.py",
         "src/plotting_functions.py",
