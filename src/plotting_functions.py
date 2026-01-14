@@ -1,5 +1,6 @@
 import climepi  # noqa
 import holoviews as hv
+from holoviews import opts
 import numpy as np
 import xarray as xr
 from bokeh.io import export_svg
@@ -11,39 +12,6 @@ WEBDRIVER_SERVICE = FirefoxService(GeckoDriverManager().install())
 WEBDRIVER_OPTIONS = FirefoxOptions()
 WEBDRIVER_OPTIONS.add_argument("--headless")
 
-PLOT_OPTS = {
-    "frame_width": 500,
-    "frame_height": 250,
-    "fontsize": {"title": 14, "labels": 12, "ticks": 10},
-    "backend_opts": {
-        "plot.min_border_left": 20,
-        "plot.output_backend": "svg",
-        "plot.background_fill_color": None,
-        "plot.border_fill_color": None,
-        "title.text_font_style": "normal",
-        "title.offset": -15,
-        "xaxis.axis_label_text_font_style": "normal",
-        "yaxis.axis_label_text_font_style": "normal",
-    },
-}
-PLOT_OPTS_EXTRA_TITLE_OFFSET = {
-    **PLOT_OPTS,
-    "backend_opts": {
-        **PLOT_OPTS["backend_opts"],
-        "plot.min_border_left": 75,
-        "title.offset": -70,
-    },
-}
-MAP_PLOT_OPTS = {
-    "colorbar_opts": {
-        "title_text_font_style": "normal",
-        "title_standoff": 10,
-        "padding": 5,
-    },
-    "xaxis": None,
-    "yaxis": None,
-}
-
 
 def make_mean_plots(
     data_path=None,
@@ -51,7 +19,7 @@ def make_mean_plots(
     save_base_path=None,
     **plot_kwargs,
 ):
-    plot_opts = {**PLOT_OPTS, **MAP_PLOT_OPTS}
+    plot_opts = _get_plot_opts(map_plot=True)
     ds = xr.open_dataset(data_path)
     before_year_range = ds.attrs["before_year_range"]
     after_year_range = ds.attrs["after_year_range"]
@@ -64,7 +32,7 @@ def make_mean_plots(
         title=f"{panel_labels[0]}. Before climate intervention ({before_year_range})",
         clabel="Mean days suitable",
     )
-    p1.Image.I.opts(**plot_opts)
+    p1 = p1.opts(opts.Image(**plot_opts), clone=True)
     p2 = ds.climepi.plot_map(
         "without_intervention_minus_before",
         symmetric=True,
@@ -75,7 +43,7 @@ def make_mean_plots(
         clabel="Change in mean days suitable",
         **plot_kwargs,
     )
-    p2.Image.I.opts(**plot_opts)
+    p2 = p2.opts(opts.Image(**plot_opts), clone=True)
     p3 = ds.climepi.plot_map(
         "with_intervention_minus_before",
         symmetric=True,
@@ -86,7 +54,7 @@ def make_mean_plots(
         clabel="Change in mean days suitable",
         **plot_kwargs,
     )
-    p3.Image.I.opts(**plot_opts)
+    p3 = p3.opts(opts.Image(**plot_opts), clone=True)
     p4 = ds.climepi.plot_map(
         "with_minus_without_intervention",
         symmetric=True,
@@ -95,21 +63,18 @@ def make_mean_plots(
         clabel="Difference in mean days suitable",
         **plot_kwargs,
     )
-    p4.Image.I.opts(**plot_opts)
-    plots = hv.Layout([p1, p2, p3, p4]).opts(shared_axes=False).cols(2)
-    if save_base_path:
-        for plot, name in zip(
-            [p1, p2, p3, p4],
-            [
-                "before",
-                "without_intervention_minus_before",
-                "with_intervention_minus_before",
-                "with_minus_without_intervention",
-            ],
-        ):
-            save_path = f"{save_base_path}_{name}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+    p4 = p4.opts(opts.Image(**plot_opts), clone=True)
+    for plot, name in zip(
+        [p1, p2, p3, p4],
+        [
+            "before",
+            "without_intervention_minus_before",
+            "with_intervention_minus_before",
+            "with_minus_without_intervention",
+        ],
+    ):
+        save_path = f"{save_base_path}_{name}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def make_change_example_plots(
@@ -120,8 +85,7 @@ def make_change_example_plots(
     **plot_kwargs,
 ):
     plot_opts = {
-        **PLOT_OPTS,
-        **MAP_PLOT_OPTS,
+        **_get_plot_opts(map_plot=True),
         "symmetric": True,
         "cmap": "bwr",
         "clabel": "Change in mean days suitable",
@@ -143,15 +107,12 @@ def make_change_example_plots(
             clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
             **plot_kwargs,
         )
-        p_curr.Image.I.opts(**plot_opts)
+        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_ex_list.append(p_curr)
-    plots = hv.Layout(p_ex_list).cols(3)
-    if save_base_path:
-        for plot, realization in zip(p_ex_list, realizations):
-            member_id = f"{realization + 1:03d}"
-            save_path = f"{save_base_path}_ID_{member_id}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+    for plot, realization in zip(p_ex_list, realizations):
+        member_id = f"{realization + 1:03d}"
+        save_path = f"{save_base_path}_ID_{member_id}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def make_change_summary_plots(
@@ -167,8 +128,7 @@ def make_change_summary_plots(
     ]
     cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
     plot_opts = {
-        **PLOT_OPTS,
-        **MAP_PLOT_OPTS,
+        **_get_plot_opts(map_plot=True),
         "clim": (0, 100),
         "cmap": cmap,
         "cticks": list(range(0, 101, 10)),
@@ -188,16 +148,13 @@ def make_change_summary_plots(
             clabel="Percentage of ensemble members",
             **plot_kwargs,
         )
-        p_curr.Image.I.opts(**plot_opts)
+        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_list.append(p_curr)
-    plots = hv.Layout(p_list).opts(shared_axes=False).cols(2)
-    if save_base_path:
-        for plot, name in zip(
-            p_list, [f"threshold_{threshold}" for threshold in thresholds]
-        ):
-            save_path = f"{save_base_path}_{name}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+    for plot, name in zip(
+        p_list, [f"threshold_{threshold}" for threshold in thresholds]
+    ):
+        save_path = f"{save_base_path}_{name}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def make_trend_example_plots(
@@ -208,8 +165,7 @@ def make_trend_example_plots(
     **plot_kwargs,
 ):
     plot_opts = {
-        **PLOT_OPTS,
-        **MAP_PLOT_OPTS,
+        **_get_plot_opts(map_plot=True),
         "symmetric": True,
         "cmap": "bwr",
         "clabel": "Change in mean days suitable",
@@ -229,15 +185,12 @@ def make_trend_example_plots(
             clim=(-max_change, max_change),
             **plot_kwargs,
         )
-        p_curr.Image.I.opts(**plot_opts)
+        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_ex_list.append(p_curr)
-    plots = hv.Layout(p_ex_list).cols(3)
-    if save_base_path:
-        for plot, realization in zip(p_ex_list, realizations):
-            member_id = f"{realization + 1:03d}"
-            save_path = f"{save_base_path}_ID_{member_id}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+    for plot, realization in zip(p_ex_list, realizations):
+        member_id = f"{realization + 1:03d}"
+        save_path = f"{save_base_path}_ID_{member_id}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def make_trend_summary_plots(
@@ -253,8 +206,7 @@ def make_trend_summary_plots(
     ]
     cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
     plot_opts = {
-        **PLOT_OPTS,
-        **MAP_PLOT_OPTS,
+        **_get_plot_opts(map_plot=True),
         "clim": (0, 100),
         "cmap": cmap,
         "cticks": list(range(0, 101, 10)),
@@ -273,16 +225,13 @@ def make_trend_summary_plots(
             clabel="Percentage of ensemble members",
             **plot_kwargs,
         )
-        p_curr.Image.I.opts(**plot_opts)
+        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_list.append(p_curr)
-    plots = hv.Layout(p_list).opts(shared_axes=False).cols(2)
-    if save_base_path:
-        for plot, name in zip(
-            p_list, [f"threshold_{threshold}" for threshold in thresholds]
-        ):
-            save_path = f"{save_base_path}_{name}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+    for plot, name in zip(
+        p_list, [f"threshold_{threshold}" for threshold in thresholds]
+    ):
+        save_path = f"{save_base_path}_{name}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def make_location_example_plots(
@@ -294,7 +243,7 @@ def make_location_example_plots(
     **plot_kwargs,
 ):
     plot_opts = {
-        **PLOT_OPTS_EXTRA_TITLE_OFFSET,
+        **_get_plot_opts(extra_title_offset=True),
         "ylim": (0, None),
         "xlabel": "Year",
         "ylabel": "Days suitable for transmission",
@@ -309,10 +258,10 @@ def make_location_example_plots(
     if panel_labels is None:
         panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(locations)]
     colors = hv.Cycle().values
-    p_trend_list = []
+    p_list = []
     for location, panel_label in zip(locations, panel_labels):
         p_curr = hv.VLine(ds.time.values[0]).opts(
-            line_color="black", line_dash="dashed"
+            line_color="black", line_dash="dashed", clone=True
         )
         for realization in range(5):
             realization_pair = [realization, (realization + 5) % 10]
@@ -326,7 +275,7 @@ def make_location_example_plots(
             ds_before_curr = ds_before.sel(realization=realization, location=location)
             p_curr *= ds_before_curr.climepi.plot_time_series(
                 "before", **before_plot_kwargs
-            ).opts(title=f"{panel_label}. {location}", **plot_opts)
+            ).opts(title=f"{panel_label}. {location}", **plot_opts, clone=True)
             if highlight:
                 p_curr *= ds_before_curr.climepi.plot_time_series(
                     "before", line_dash="dashed", **before_plot_kwargs
@@ -369,14 +318,11 @@ def make_location_example_plots(
                     p_curr *= ds_after_curr.climepi.plot_time_series(
                         "after_trend", **after_trend_plot_kwargs
                     )
-        p_curr.opts(legend_position="bottom_right")
-        p_trend_list.append(p_curr)
-    plots = hv.Layout(p_trend_list).opts(shared_axes=True).cols(2)
-    if save_base_path:
-        for plot, location in zip(plots, locations):
-            save_path = f"{save_base_path}_{location.lower().replace(' ', '_')}.svg"
-            _save_fig(plot, save_path=save_path)
-    return plots
+        p_curr = p_curr.opts(legend_position="bottom_right", clone=True)
+        p_list.append(p_curr)
+    for plot, location in zip(p_list, locations):
+        save_path = f"{save_base_path}_{location.lower().replace(' ', '_')}.svg"
+        _save_fig(plot, save_path=save_path)
 
 
 def _save_fig(plot, save_path=None):
@@ -384,3 +330,36 @@ def _save_fig(plot, save_path=None):
         bokeh_plot = hv.render(plot, backend="bokeh")
         bokeh_plot.sizing_mode = None  # stops warnings about width/height not being set
         export_svg(bokeh_plot, filename=save_path, webdriver=driver)
+
+
+def _get_plot_opts(extra_title_offset=False, map_plot=False):
+    plot_opts = {
+        "frame_width": 500,
+        "frame_height": 250,
+        "fontsize": {"title": 14, "labels": 12, "ticks": 10},
+        "backend_opts": {
+            "plot.min_border_left": 20,
+            "plot.output_backend": "svg",
+            "plot.background_fill_color": None,
+            "plot.border_fill_color": None,
+            "title.text_font_style": "normal",
+            "title.offset": -15,
+            "xaxis.axis_label_text_font_style": "normal",
+            "yaxis.axis_label_text_font_style": "normal",
+        },
+    }
+    if extra_title_offset:
+        plot_opts["backend_opts"] = {
+            **plot_opts["backend_opts"],
+            "plot.min_border_left": 75,
+            "title.offset": -70,
+        }
+    if map_plot:
+        plot_opts["colorbar_opts"] = {
+            "title_text_font_style": "normal",
+            "title_standoff": 10,
+            "padding": 5,
+        }
+        plot_opts["xaxis"] = None
+        plot_opts["yaxis"] = None
+    return plot_opts
