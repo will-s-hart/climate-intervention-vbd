@@ -56,6 +56,7 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
     make_change_example_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
+        realizations=[0, 5],
         save_path=save_dir / "change_example.nc",
     )
     make_location_example_plot_data(
