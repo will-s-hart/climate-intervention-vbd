@@ -1,9 +1,13 @@
+import pathlib
+
 import climepi  # noqa
 import holoviews as hv
-from holoviews import opts
+import hvplot.pandas  # noqa
 import numpy as np
+import pandas as pd
 import xarray as xr
 from bokeh.io import export_svg
+from holoviews import opts
 from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
@@ -17,6 +21,7 @@ def make_mean_plots(
     data_path=None,
     panel_labels=("A", "B", "C", "D"),
     save_base_path=None,
+    occurence_data=True,
     **plot_kwargs,
 ):
     plot_opts = _get_plot_opts(map_plot=True)
@@ -33,6 +38,13 @@ def make_mean_plots(
         clabel="Mean days suitable",
     )
     p1 = p1.opts(opts.Image(**plot_opts), clone=True)
+    if occurence_data:
+        # Plot (thinned) occurrence data from https://doi.org/10.1038/s41467-025-58609-5
+        df = pd.read_csv(
+            pathlib.Path(__file__).parents[1] / "data/arbo_occ_thinned.csv"
+        )
+        df = df[df["disease"] == "dengue"]
+        p1 *= df.hvplot.points(x="Longitude", y="Latitude", color="red", size=0.5)
     p2 = ds.climepi.plot_map(
         "without_intervention_minus_before",
         symmetric=True,
