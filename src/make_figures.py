@@ -42,7 +42,7 @@ def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
     make_location_example_plots(
         data_path=data_dir / "location.nc",
         highlight_realization=0,
-        panel_labels=["C"],
+        panel_labels=["C", "D"],
         save_base_path=save_dir / "location",
     )
     if main_only:
@@ -122,11 +122,12 @@ def compile_figures(
             panel_dir / "change_example_ID_001.svg",
             panel_dir / "change_example_ID_006.svg",
             panel_dir / "location_london.svg",
+            panel_dir / "location_seattle.svg",
         ],
         save_path=save_dir / f"figure_{figure_numbers[1]}.svg",
         panel_height=310,
-        tiling=(1, 3),
-        # offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
+        tiling=(2, 2),
+        offsets=[(0, 0), (0, 0), (0, -25), (0, -25)],
     )
     if main_only:
         return

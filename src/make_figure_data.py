@@ -62,7 +62,7 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
     make_location_example_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
-        locations=["London"],
+        locations=["London", "Seattle"],
         save_path=save_dir / "location.nc",
     )
     # Fig S1 data

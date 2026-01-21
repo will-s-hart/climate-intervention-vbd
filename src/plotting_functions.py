@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from bokeh.io import export_svg
+from bokeh.palettes import interp_palette
 from holoviews import opts
 from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -134,10 +135,7 @@ def make_change_summary_plots(
     save_base_path=None,
     **plot_kwargs,
 ):
-    colors = [
-        f"#{255:02x}{int(255 * (1 - i / 10)):02x}{int(255 * (1 - i / 10)):02x}"
-        for i in range(11)
-    ]
+    colors = interp_palette(["white", "crimson"], 11)
     cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
     plot_opts = {
         **_get_plot_opts(map_plot=True),
@@ -212,10 +210,7 @@ def make_trend_summary_plots(
     save_base_path=None,
     **plot_kwargs,
 ):
-    colors = [
-        f"#{255:02x}{int(255 * (1 - i / 10)):02x}{int(255 * (1 - i / 10)):02x}"
-        for i in range(11)
-    ]
+    colors = interp_palette(["white", "crimson"], 11)
     cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
     plot_opts = {
         **_get_plot_opts(map_plot=True),
