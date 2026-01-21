@@ -31,3 +31,4 @@ prod = { features = [], solve-group = "prod" }
 [tool.pixi.feature.dev.tasks]
 lint = "ruff check"
 format = "ruff format"
+figures-png = "snakemake --cores 1 --allowed-rules figures_png --force figures_png"
