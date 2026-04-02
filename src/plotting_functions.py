@@ -18,11 +18,83 @@ WEBDRIVER_OPTIONS = FirefoxOptions()
 WEBDRIVER_OPTIONS.add_argument("--headless")
 
 
+def make_current_plot(
+    data_path=None,
+    panel_label="A",
+    save_base_path=None,
+    **plot_kwargs,
+):
+    plot_opts = _get_plot_opts(map_plot=True)
+    ds = xr.open_dataset(data_path)
+    before_year_range = ds.attrs["before_year_range"]
+    p = ds.climepi.plot_map(
+        "before",
+        title=f"{panel_label}. Dengue suitability ({before_year_range})",
+        clabel="Mean days suitable",
+        **plot_kwargs,
+    )
+    p = p.opts(opts.Image(**plot_opts), clone=True)
+    # Plot (thinned) occurrence data from https://doi.org/10.1038/s41467-025-58609-5
+    df = pd.read_csv(pathlib.Path(__file__).parents[1] / "data/arbo_occ_thinned.csv")
+    df = df[df["disease"] == "dengue"]
+    p *= df.hvplot.points(x="Longitude", y="Latitude", color="red", size=0.5)
+    save_path = f"{save_base_path}.svg"
+    _save_fig(p, save_path=save_path)
+    return
+
+
+def make_temperature_time_series_plot(
+    data_path=None,
+    panel_label="B",
+    save_base_path=None,
+    **plot_kwargs,
+):
+    colors = hv.Cycle().values
+    plot_opts = {
+        **_get_plot_opts(extra_title_offset=True),
+        "xlim": (2015, 2065),
+        "ylim": (14, 17),
+        "xlabel": "Year",
+        "ylabel": "Temperature (°C)",
+        "legend_position": "top_left",
+        "title": f"{panel_label}. Global mean temperature under climate change and "
+        "intervention",
+    }
+    ds = xr.open_dataset(data_path)
+    ds = ds.sel(scenario=["ssp245", "sai15"]).assign_coords(
+        scenario=[
+            "Without climate intervention (SSP2-4.5)",
+            "With intervention (ARISE-SAI-1.5)",
+        ]
+    )
+    ds["time"] = ds.time.dt.year
+    ds_mean = ds.mean(dim="realization")
+    p = (
+        ds.climepi.plot_time_series(
+            by=["scenario", "realization"],
+            color=[colors[0], colors[1]],
+            line_width=0.5,
+            legend=False,
+            **plot_kwargs,
+        )
+        * ds_mean.climepi.plot_time_series(
+            by="scenario",
+            color=[colors[0], colors[1]],
+            **plot_kwargs,
+        )
+        * hv.VLine(ds.time.values[20]).opts(
+            line_color="black", line_dash="dashed", clone=True
+        )
+    )
+    p = p.opts(**plot_opts, clone=True)
+    save_path = f"{save_base_path}.svg"
+    _save_fig(p, save_path=save_path)
+
+
 def make_mean_plots(
     data_path=None,
     panel_labels=("A", "B", "C", "D"),
     save_base_path=None,
-    occurence_data=True,
     **plot_kwargs,
 ):
     plot_opts = _get_plot_opts(map_plot=True)
@@ -37,15 +109,9 @@ def make_mean_plots(
         "before",
         title=f"{panel_labels[0]}. Before climate intervention ({before_year_range})",
         clabel="Mean days suitable",
+        **plot_kwargs,
     )
     p1 = p1.opts(opts.Image(**plot_opts), clone=True)
-    if occurence_data:
-        # Plot (thinned) occurrence data from https://doi.org/10.1038/s41467-025-58609-5
-        df = pd.read_csv(
-            pathlib.Path(__file__).parents[1] / "data/arbo_occ_thinned.csv"
-        )
-        df = df[df["disease"] == "dengue"]
-        p1 *= df.hvplot.points(x="Longitude", y="Latitude", color="red", size=0.5)
     p2 = ds.climepi.plot_map(
         "without_intervention_minus_before",
         symmetric=True,
@@ -144,8 +210,8 @@ def make_change_summary_plots(
         "cticks": list(range(0, 101, 10)),
     }
     ds = xr.open_dataset(data_path)
-    before_year_range = ds.attrs["before_year_range"]
-    after_year_range = ds.attrs["after_year_range"]
+    # before_year_range = ds.attrs["before_year_range"]
+    # after_year_range = ds.attrs["after_year_range"]
     if thresholds is None:
         thresholds = ds.threshold.values.tolist()
     if panel_labels is None:
@@ -153,8 +219,7 @@ def make_change_summary_plots(
     p_list = []
     for threshold, panel_label in zip(thresholds, panel_labels):
         p_curr = ds.sel(threshold=threshold).climepi.plot_map(
-            title=f"{panel_label}. Increase in mean days suitable "
-            f"({after_year_range} vs {before_year_range}, {threshold} day threshold)",
+            title=f"{panel_label}. {threshold}-day threshold",
             clabel="Percentage of ensemble members",
             **plot_kwargs,
         )
@@ -358,8 +423,10 @@ def _get_plot_opts(extra_title_offset=False, map_plot=False):
     if extra_title_offset:
         plot_opts["backend_opts"] = {
             **plot_opts["backend_opts"],
-            "plot.min_border_left": 75,
-            "title.offset": -70,
+            # "plot.min_border_left": 75,
+            # "title.offset": -70,
+            "plot.min_border_left": 70,
+            "title.offset": -65,
         }
     if map_plot:
         plot_opts["colorbar_opts"] = {

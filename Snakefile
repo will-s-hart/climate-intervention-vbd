@@ -12,14 +12,23 @@ def get_download_file(dataset, realization, year):
     return f"results/downloads/{dataset}/{realization}_{year}.txt"
 
 
-def get_result_file(dataset, realization, year, epi_model_name):
+def get_mean_temperature_file(dataset, realization, year):
+    return f"results/mean_temperatures/{dataset}/{realization}_{year}.nc"
+
+
+def get_epi_result_file(dataset, realization, year, epi_model_name):
     return f"results/{epi_model_name}/{dataset}/{realization}_{year}.nc"
+
+
+def get_temperature_figure_data_file(native_or_downscaled):
+    return f"results/figure_data/{native_or_downscaled}/temperature_time_series.nc"
 
 
 def get_figure_data_files(epi_model_name, native_or_downscaled):
     return [
         f"results/figure_data/{native_or_downscaled}/{epi_model_name}/{analysis}.nc"
         for analysis in [
+            "current",
             "mean",
             "change_example",
             "location",
@@ -27,9 +36,7 @@ def get_figure_data_files(epi_model_name, native_or_downscaled):
             "even_later_mean",
             "change_example_others",
             "location_others",
-            "trend_example",
             "change_summary",
-            "trend_summary",
         ]
     ]
 
@@ -40,6 +47,8 @@ def get_figure_files(native_or_downscaled):
         for fig_name in [
             "figure_1",
             "figure_2",
+            "figure_3",
+            "figure_4",
             "figure_S1",
             "figure_S2",
             "figure_S3",
@@ -58,8 +67,15 @@ download_files = [
     for year in meta["subset"]["years"]
 ]
 
-result_files = [
-    get_result_file(dataset, realization, year, epi_model_name)
+mean_temperature_files = [
+    get_mean_temperature_file(dataset, realization, year)
+    for dataset, meta in DATASETS.items()
+    for realization in meta["subset"]["realizations"]
+    for year in meta["subset"]["years"]
+]
+
+epi_result_files = [
+    get_epi_result_file(dataset, realization, year, epi_model_name)
     for dataset, meta in DATASETS.items()
     for realization in meta["subset"]["realizations"]
     for year in meta["subset"]["years"]
@@ -71,6 +87,9 @@ figure_data_files = [
     for native_or_downscaled in ["native", "downscaled"]
     for epi_model_name in EPI_MODELS
     for file in get_figure_data_files(epi_model_name, native_or_downscaled)
+] + [
+    get_temperature_figure_data_file(native_or_downscaled)
+    for native_or_downscaled in ["native", "downscaled"]
 ]
 
 figure_files = get_figure_files(native_or_downscaled="downscaled") + get_figure_files(
@@ -107,7 +126,8 @@ rule downloads:
 
 rule results:
     input:
-        result_files,
+        mean_temperature_files,
+        epi_result_files,
 
 
 rule download_data:
@@ -125,6 +145,24 @@ rule download_data:
         """
 
 
+rule calc_mean_temperatures:
+    input:
+        lambda wildcards: get_download_file(
+            wildcards.dataset, wildcards.realization, wildcards.year
+        ),
+        "src/inputs.py",
+        "src/calc_mean_temperatures.py",
+    output:
+        get_mean_temperature_file("{dataset}", "{realization}", "{year}"),
+    shell:
+        """
+        pixi run python src/calc_mean_temperatures.py \
+            --dataset {wildcards.dataset} \
+            --years {wildcards.year} \
+            --realizations {wildcards.realization}
+        """
+
+
 rule run_epi_model:
     input:
         lambda wildcards: get_download_file(
@@ -133,7 +171,7 @@ rule run_epi_model:
         "src/inputs.py",
         "src/run_epi_model.py",
     output:
-        get_result_file("{dataset}", "{realization}", "{year}", "{epi_model_name}"),
+        get_epi_result_file("{dataset}", "{realization}", "{year}", "{epi_model_name}"),
     shell:
         """
         pixi run python src/run_epi_model.py \
@@ -144,11 +182,35 @@ rule run_epi_model:
         """
 
 
+rule make_temperature_figure_data:
+    input:
+        lambda wildcards: [
+            file
+            for file in mean_temperature_files
+            if (
+                ("downscaled" in file)
+                == (wildcards.native_or_downscaled == "downscaled")
+            )
+        ],
+        "src/make_figure_data.py",
+        "src/figure_data_functions.py",
+    output:
+        get_temperature_figure_data_file("{native_or_downscaled}"),
+    params:
+        opts=lambda wildcards: (
+            "--temperature --downscaled"
+            if wildcards.native_or_downscaled == "downscaled"
+            else "--temperature"
+        ),
+    shell:
+        "pixi run python src/make_figure_data.py {params.opts}"
+
+
 rule make_figure_data:
     input:
         lambda wildcards: [
             file
-            for file in result_files
+            for file in epi_result_files
             if wildcards.epi_model_name in file
             and (
                 ("downscaled" in file)

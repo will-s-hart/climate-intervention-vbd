@@ -7,7 +7,7 @@ DATASETS = {
         "data_source": "arise",
         "frequency": "daily",
         "subset": {
-            "years": list(range(2025, 2065)),
+            "years": list(range(2015, 2065)),
             "scenarios": ["ssp245"],
             "realizations": list(range(10)),
         },
@@ -25,7 +25,7 @@ DATASETS = {
     },
     "arise_control_downscaled": {
         "subset": {
-            "years": list(range(2025, 2065)),
+            "years": list(range(2015, 2065)),
             "scenarios": ["ssp245"],
             "realizations": list(range(10)),
         },

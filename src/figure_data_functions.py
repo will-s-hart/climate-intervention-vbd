@@ -1,5 +1,6 @@
 import climepi  # noqa
 import xarray as xr
+import xcdat.spatial  # noqa
 
 
 def _get_feedback_matched_before_dataset(ds_before):
@@ -17,6 +18,19 @@ def _get_feedback_matched_before_dataset(ds_before):
     )
 
 
+def make_temperature_time_series_plot_data(
+    ds_control_mean_temperatures=None,
+    ds_feedback_mean_temperatures=None,
+    save_path=None,
+):
+    ds_out = xr.concat(
+        [ds_control_mean_temperatures, ds_feedback_mean_temperatures],
+        dim="scenario",
+        join="outer",
+    )
+    ds_out.to_netcdf(save_path)
+
+
 def make_mean_plot_data(
     ds_control=None,
     ds_feedback=None,
@@ -28,6 +42,13 @@ def make_mean_plot_data(
         time=ds_control.time.dt.year.isin(before_years)
     ).squeeze()
     ds_before_mean = ds_before[["portion_suitable"]].mean(dim=["time", "realization"])
+    ds_out = xr.Dataset(
+        {"before": ds_before_mean["portion_suitable"]},
+        attrs={"before_year_range": f"{before_years.start}-{before_years.stop - 1}"},
+    )
+    if after_years is None:
+        ds_out.to_netcdf(save_path)
+        return
     ds_control_after = ds_control.sel(
         time=ds_control.time.dt.year.isin(after_years)
     ).squeeze()
@@ -40,26 +61,15 @@ def make_mean_plot_data(
     ds_feedback_after_mean = ds_feedback_after[["portion_suitable"]].mean(
         dim=["time", "realization"]
     )
-    ds_out = xr.Dataset(
-        {
-            "before": ds_before_mean["portion_suitable"],
-            "without_intervention_minus_before": (
-                ds_control_after_mean["portion_suitable"]
-                - ds_before_mean["portion_suitable"]
-            ),
-            "with_intervention_minus_before": (
-                ds_feedback_after_mean["portion_suitable"]
-                - ds_before_mean["portion_suitable"]
-            ),
-            "with_minus_without_intervention": (
-                ds_feedback_after_mean["portion_suitable"]
-                - ds_control_after_mean["portion_suitable"]
-            ),
-        },
-        attrs={
-            "before_year_range": f"{before_years.start}-{before_years.stop - 1}",
-            "after_year_range": f"{after_years.start}-{after_years.stop - 1}",
-        },
+    ds_out = ds_out.assign(
+        without_intervention_minus_before=ds_control_after_mean["portion_suitable"]
+        - ds_before_mean["portion_suitable"],
+        with_intervention_minus_before=ds_feedback_after_mean["portion_suitable"]
+        - ds_before_mean["portion_suitable"],
+        with_minus_without_intervention=ds_feedback_after_mean["portion_suitable"]
+        - ds_control_after_mean["portion_suitable"],
+    ).assign_attrs(
+        after_year_range=f"{after_years.start}-{after_years.stop - 1}",
     )
     ds_out.to_netcdf(save_path)
 

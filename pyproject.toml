@@ -15,6 +15,7 @@ snakemake = "*"
 snakemake-executor-plugin-slurm = "*"
 svgutils = "*"
 xarray = "*"
+xcdat = "*"
 webdriver-manager = "*"
 
 [tool.pixi.feature.dev.dependencies]
