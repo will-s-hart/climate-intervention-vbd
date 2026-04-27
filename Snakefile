@@ -56,6 +56,7 @@ def get_figure_files(native_or_downscaled):
             "figure_S5",
             "figure_S6",
             "figure_S7",
+            "figure_S8",
         ]
     ]
 
