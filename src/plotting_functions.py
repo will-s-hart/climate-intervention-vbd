@@ -36,9 +36,11 @@ def make_current_plot(
     p = _make_map_plot(
         ds,
         plot_var="before",
-        title=f"{panel_label}. Dengue suitability ({before_year_range})",
-        clabel="Mean days suitable",
-        **plot_kwargs,
+        **{
+            "title": f"{panel_label}. Dengue suitability ({before_year_range})",
+            "clabel": "Mean days suitable",
+            **plot_kwargs,
+        },
     )
     p = p.opts(opts.Image(**plot_opts), clone=True)
     # Plot (thinned) occurrence data from https://doi.org/10.1038/s41467-025-58609-5
@@ -78,16 +80,20 @@ def make_temperature_time_series_plot(
     ds_mean = ds.mean(dim="realization")
     p = (
         ds.climepi.plot_time_series(
-            by=["scenario", "realization"],
-            color=[colors[0], colors[1]],
-            line_width=0.5,
-            legend=False,
-            **plot_kwargs,
+            **{
+                "by": ["scenario", "realization"],
+                "color": [colors[0], colors[1]],
+                "line_width": 0.5,
+                "legend": False,
+                **plot_kwargs,
+            },
         )
         * ds_mean.climepi.plot_time_series(
-            by="scenario",
-            color=[colors[0], colors[1]],
-            **plot_kwargs,
+            **{
+                "by": "scenario",
+                "color": [colors[0], colors[1]],
+                **plot_kwargs,
+            },
         )
         * hv.VLine(ds.time.values[20]).opts(
             line_color="black", line_dash="dashed", clone=True
@@ -102,6 +108,7 @@ def make_mean_plots(
     data_path=None,
     panel_labels=("A", "B", "C", "D"),
     save_base_path=None,
+    clim_diff=None,
     **plot_kwargs,
 ):
     plot_opts = _get_plot_opts(map_plot=True)
@@ -115,43 +122,60 @@ def make_mean_plots(
     p1 = _make_map_plot(
         ds,
         plot_var="before",
-        title=f"{panel_labels[0]}. Before climate intervention ({before_year_range})",
-        clabel="Mean days suitable",
-        **plot_kwargs,
+        **{
+            "title": f"{panel_labels[0]}. Before climate intervention ({before_year_range})",
+            "clabel": "Mean days suitable",
+            **plot_kwargs,
+        },
     )
     p1 = p1.opts(opts.Image(**plot_opts), clone=True)
     p2 = _make_map_plot(
         ds,
         plot_var="without_intervention_minus_before",
-        symmetric=True,
-        cmap="bwr",
-        clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
-        title=f"{panel_labels[1]}. Without intervention "
-        f"({after_year_range} vs {before_year_range})",
-        clabel="Change in mean days suitable",
-        **plot_kwargs,
+        **{
+            "symmetric": True,
+            "cmap": "bwr",
+            "clim": clim_diff
+            or (
+                -max_diff_before_to_after_mean,
+                max_diff_before_to_after_mean,
+            ),
+            "title": f"{panel_labels[1]}. Without intervention "
+            f"({after_year_range} vs {before_year_range})",
+            "clabel": "Change in mean days suitable",
+            **plot_kwargs,
+        },
     )
     p2 = p2.opts(opts.Image(**plot_opts), clone=True)
     p3 = _make_map_plot(
         ds,
         plot_var="with_intervention_minus_before",
-        symmetric=True,
-        cmap="bwr",
-        clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
-        title=f"{panel_labels[2]}. With intervention "
-        f"({after_year_range} vs {before_year_range})",
-        clabel="Change in mean days suitable",
-        **plot_kwargs,
+        **{
+            "symmetric": True,
+            "cmap": "bwr",
+            "clim": clim_diff
+            or (
+                -max_diff_before_to_after_mean,
+                max_diff_before_to_after_mean,
+            ),
+            "title": f"{panel_labels[2]}. With intervention "
+            f"({after_year_range} vs {before_year_range})",
+            "clabel": "Change in mean days suitable",
+            **plot_kwargs,
+        },
     )
     p3 = p3.opts(opts.Image(**plot_opts), clone=True)
     p4 = _make_map_plot(
         ds,
         plot_var="with_minus_without_intervention",
-        symmetric=True,
-        cmap="bwr",
-        title=f"{panel_labels[3]}. With vs without intervention ({after_year_range})",
-        clabel="Difference in mean days suitable",
-        **plot_kwargs,
+        **{
+            "symmetric": True,
+            "cmap": "bwr",
+            "title": f"{panel_labels[3]}. With vs without intervention ({after_year_range})",
+            "clabel": "Difference in mean days suitable",
+            **({"clim": clim_diff} if clim_diff else {}),
+            **plot_kwargs,
+        },
     )
     p4 = p4.opts(opts.Image(**plot_opts), clone=True)
     for plot, name in zip(
@@ -194,10 +218,15 @@ def make_change_example_plots(
         p_curr = _make_map_plot(
             ds.sel(realization=realization),
             plot_var="mean_change",
-            title=f"{panel_label}. ID {member_id} "
-            f"({after_year_range} vs {before_year_range})",
-            clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
-            **plot_kwargs,
+            **{
+                "title": f"{panel_label}. ID {member_id} "
+                f"({after_year_range} vs {before_year_range})",
+                "clim": (
+                    -max_diff_before_to_after_mean,
+                    max_diff_before_to_after_mean,
+                ),
+                **plot_kwargs,
+            },
         )
         p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_ex_list.append(p_curr)
@@ -234,9 +263,11 @@ def make_change_summary_plots(
         p_curr = _make_map_plot(
             ds.sel(threshold=threshold),
             plot_var="percent_realizations_increasing",
-            title=f"{panel_label}. {threshold}-day threshold",
-            clabel="Percentage of ensemble members",
-            **plot_kwargs,
+            **{
+                "title": f"{panel_label}. {threshold}-day threshold",
+                "clabel": "Percentage of ensemble members",
+                **plot_kwargs,
+            },
         )
         p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_list.append(p_curr)
@@ -273,9 +304,11 @@ def make_trend_example_plots(
         p_curr = _make_map_plot(
             ds.sel(realization=realization),
             plot_var="trend_change",
-            title=f"{panel_label}. ID {member_id} (trend change, {after_year_range})",
-            clim=(-max_change, max_change),
-            **plot_kwargs,
+            **{
+                "title": f"{panel_label}. ID {member_id} (trend change, {after_year_range})",
+                "clim": (-max_change, max_change),
+                **plot_kwargs,
+            },
         )
         p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_ex_list.append(p_curr)
@@ -311,10 +344,12 @@ def make_trend_summary_plots(
         p_curr = _make_map_plot(
             ds.sel(threshold=threshold),
             plot_var="percent_realizations_increasing",
-            title=f"{panel_label}. Increasing trend "
-            f"({after_year_range}, {threshold} day threshold)",
-            clabel="Percentage of ensemble members",
-            **plot_kwargs,
+            **{
+                "title": f"{panel_label}. Increasing trend "
+                f"({after_year_range}, {threshold} day threshold)",
+                "clabel": "Percentage of ensemble members",
+                **plot_kwargs,
+            },
         )
         p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
         p_list.append(p_curr)
@@ -369,7 +404,7 @@ def make_location_example_plots(
             ).opts(title=f"{panel_label}. {location}", **plot_opts, clone=True)
             if highlight:
                 p_curr *= ds_before_curr.climepi.plot_time_series(
-                    "before", line_dash="dashed", **before_plot_kwargs
+                    "before", **{"line_dash": "dashed", **before_plot_kwargs}
                 )
             for realization_, member_id_, color in zip(
                 realization_pair,

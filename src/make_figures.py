@@ -38,12 +38,17 @@ def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
     )
     # Fig 2 panels
     print("Making Fig 2 panels...")
-    make_mean_plots(data_path=data_dir / "mean.nc", save_base_path=save_dir / "mean")
+    make_mean_plots(
+        data_path=data_dir / "mean.nc",
+        save_base_path=save_dir / "mean",
+        clim_diff=(-30, 30),
+    )
     # Fig 3 panels
     print("Making Fig 3 panels...")
     make_change_example_plots(
         data_path=data_dir / "change_example.nc",
         save_base_path=save_dir / "change_example",
+        clim=(-30, 30),
     )
     # Fig 4 panels
     print("Making Fig 4 panels...")
@@ -60,11 +65,13 @@ def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
         data_path=data_dir / "later_mean.nc",
         panel_labels=["", "A", "C", "E"],
         save_base_path=save_dir / "later_mean",
+        clim_diff=(-50, 50),
     )
     make_mean_plots(
         data_path=data_dir / "even_later_mean.nc",
         panel_labels=["", "B", "D", "F"],
         save_base_path=save_dir / "even_later_mean",
+        clim_diff=(-80, 80),
     )
     # Fig S2 panels
     print("Making Fig S2 panels...")
@@ -72,6 +79,7 @@ def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
         data_path=data_dir / "change_example_others.nc",
         save_base_path=save_dir / "change_example_others",
         panel_labels=["A", "C", "E", "B", "D", "F"],
+        clim=(-30, 30),
     )
     # Fig S3 panels
     print("Making Fig S3 panels...")
