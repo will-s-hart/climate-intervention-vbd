@@ -1,6 +1,7 @@
 import pathlib
 
 import climepi  # noqa
+import geoviews.feature as gf
 import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
@@ -8,6 +9,7 @@ import pandas as pd
 import xarray as xr
 from bokeh.io import export_svg
 from bokeh.palettes import interp_palette
+from climepi._xcdat import BoundsAccessor, swap_lon_axis  # noqa
 from holoviews import opts
 from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -24,11 +26,16 @@ def make_current_plot(
     save_base_path=None,
     **plot_kwargs,
 ):
-    plot_opts = _get_plot_opts(map_plot=True)
+    plot_opts = {
+        **_get_plot_opts(map_plot=True, title_offset=-90),
+        "colorbar_position": "left",
+    }
+    plot_opts["backend_opts"]["plot.min_border_left"] = 0
     ds = xr.open_dataset(data_path)
     before_year_range = ds.attrs["before_year_range"]
-    p = ds.climepi.plot_map(
-        "before",
+    p = _make_map_plot(
+        ds,
+        plot_var="before",
         title=f"{panel_label}. Dengue suitability ({before_year_range})",
         clabel="Mean days suitable",
         **plot_kwargs,
@@ -40,7 +47,7 @@ def make_current_plot(
     p *= df.hvplot.points(x="Longitude", y="Latitude", color="red", size=0.5)
     save_path = f"{save_base_path}.svg"
     _save_fig(p, save_path=save_path)
-    return
+    return p
 
 
 def make_temperature_time_series_plot(
@@ -51,7 +58,7 @@ def make_temperature_time_series_plot(
 ):
     colors = hv.Cycle().values
     plot_opts = {
-        **_get_plot_opts(extra_title_offset=True),
+        **_get_plot_opts(title_offset=-90),
         "xlim": (2015, 2065),
         "ylim": (14, 17),
         "xlabel": "Year",
@@ -105,15 +112,17 @@ def make_mean_plots(
         np.abs((ds["without_intervention_minus_before"]).values).max(),
         np.abs((ds["with_intervention_minus_before"]).values).max(),
     )
-    p1 = ds.climepi.plot_map(
-        "before",
+    p1 = _make_map_plot(
+        ds,
+        plot_var="before",
         title=f"{panel_labels[0]}. Before climate intervention ({before_year_range})",
         clabel="Mean days suitable",
         **plot_kwargs,
     )
     p1 = p1.opts(opts.Image(**plot_opts), clone=True)
-    p2 = ds.climepi.plot_map(
-        "without_intervention_minus_before",
+    p2 = _make_map_plot(
+        ds,
+        plot_var="without_intervention_minus_before",
         symmetric=True,
         cmap="bwr",
         clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
@@ -123,8 +132,9 @@ def make_mean_plots(
         **plot_kwargs,
     )
     p2 = p2.opts(opts.Image(**plot_opts), clone=True)
-    p3 = ds.climepi.plot_map(
-        "with_intervention_minus_before",
+    p3 = _make_map_plot(
+        ds,
+        plot_var="with_intervention_minus_before",
         symmetric=True,
         cmap="bwr",
         clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
@@ -134,8 +144,9 @@ def make_mean_plots(
         **plot_kwargs,
     )
     p3 = p3.opts(opts.Image(**plot_opts), clone=True)
-    p4 = ds.climepi.plot_map(
-        "with_minus_without_intervention",
+    p4 = _make_map_plot(
+        ds,
+        plot_var="with_minus_without_intervention",
         symmetric=True,
         cmap="bwr",
         title=f"{panel_labels[3]}. With vs without intervention ({after_year_range})",
@@ -180,7 +191,9 @@ def make_change_example_plots(
     p_ex_list = []
     for realization, panel_label in zip(realizations, panel_labels):
         member_id = f"{realization + 1:03d}"
-        p_curr = ds.sel(realization=realization).climepi.plot_map(
+        p_curr = _make_map_plot(
+            ds.sel(realization=realization),
+            plot_var="mean_change",
             title=f"{panel_label}. ID {member_id} "
             f"({after_year_range} vs {before_year_range})",
             clim=(-max_diff_before_to_after_mean, max_diff_before_to_after_mean),
@@ -218,7 +231,9 @@ def make_change_summary_plots(
         panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(thresholds)]
     p_list = []
     for threshold, panel_label in zip(thresholds, panel_labels):
-        p_curr = ds.sel(threshold=threshold).climepi.plot_map(
+        p_curr = _make_map_plot(
+            ds.sel(threshold=threshold),
+            plot_var="percent_realizations_increasing",
             title=f"{panel_label}. {threshold}-day threshold",
             clabel="Percentage of ensemble members",
             **plot_kwargs,
@@ -255,7 +270,9 @@ def make_trend_example_plots(
     p_ex_list = []
     for realization, panel_label in zip(realizations, panel_labels):
         member_id = f"{realization + 1:03d}"
-        p_curr = ds.sel(realization=realization).climepi.plot_map(
+        p_curr = _make_map_plot(
+            ds.sel(realization=realization),
+            plot_var="trend_change",
             title=f"{panel_label}. ID {member_id} (trend change, {after_year_range})",
             clim=(-max_change, max_change),
             **plot_kwargs,
@@ -291,7 +308,9 @@ def make_trend_summary_plots(
         panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(thresholds)]
     p_list = []
     for threshold, panel_label in zip(thresholds, panel_labels):
-        p_curr = ds.sel(threshold=threshold).climepi.plot_map(
+        p_curr = _make_map_plot(
+            ds.sel(threshold=threshold),
+            plot_var="percent_realizations_increasing",
             title=f"{panel_label}. Increasing trend "
             f"({after_year_range}, {threshold} day threshold)",
             clabel="Percentage of ensemble members",
@@ -397,6 +416,28 @@ def make_location_example_plots(
         _save_fig(plot, save_path=save_path)
 
 
+def _make_map_plot(ds, plot_var, **kwargs):
+    ds = ds.bounds.add_missing_bounds(axes=("X",))
+    ds = swap_lon_axis(ds.reset_coords(drop=True), to=(-180, 180))
+    kwargs_hvplot = {
+        "x": "lon",
+        "y": "lat",
+        "cmap": "viridis",
+        "geo": True,
+        "global_extent": True,
+        "rasterize": True,
+        "features": ["borders", "coastline"],
+        "dynamic": False,
+        "project": True,
+        **kwargs,
+    }
+    return (
+        ds[plot_var].hvplot.image(**kwargs_hvplot)
+        * gf.ocean(fill_color="white")
+        * gf.lakes(fill_color="white")
+    )
+
+
 def _save_fig(plot, save_path=None):
     with Firefox(options=WEBDRIVER_OPTIONS, service=WEBDRIVER_SERVICE) as driver:
         bokeh_plot = hv.render(plot, backend="bokeh")
@@ -404,30 +445,24 @@ def _save_fig(plot, save_path=None):
         export_svg(bokeh_plot, filename=save_path, webdriver=driver)
 
 
-def _get_plot_opts(extra_title_offset=False, map_plot=False):
+def _get_plot_opts(extra_title_offset=False, map_plot=False, title_offset=None):
+    title_offset = title_offset or (-65 if extra_title_offset else -15)
     plot_opts = {
         "frame_width": 500,
         "frame_height": 250,
         "fontsize": {"title": 14, "labels": 12, "ticks": 10},
         "backend_opts": {
-            "plot.min_border_left": 20,
+            "plot.min_border_left": 5 - title_offset,
             "plot.output_backend": "svg",
             "plot.background_fill_color": None,
             "plot.border_fill_color": None,
+            # "plot.outline_line_color": None,
             "title.text_font_style": "normal",
-            "title.offset": -15,
+            "title.offset": title_offset,
             "xaxis.axis_label_text_font_style": "normal",
             "yaxis.axis_label_text_font_style": "normal",
         },
     }
-    if extra_title_offset:
-        plot_opts["backend_opts"] = {
-            **plot_opts["backend_opts"],
-            # "plot.min_border_left": 75,
-            # "title.offset": -70,
-            "plot.min_border_left": 70,
-            "title.offset": -65,
-        }
     if map_plot:
         plot_opts["colorbar_opts"] = {
             "title_text_font_style": "normal",
