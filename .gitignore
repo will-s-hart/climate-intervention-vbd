@@ -193,6 +193,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Claude
+.claude
+
 # snakemake
 .snakemake/
 
@@ -204,3 +207,4 @@ cluster/
 
 # Logs
 logs/
+
