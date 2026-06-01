@@ -1,10 +1,11 @@
 import argparse
+import itertools
 import pathlib
 
-import dask.diagnostics
 import numpy as np
 import xarray as xr
 from climepi import epimod
+from tqdm import tqdm
 
 from inputs import DATASETS
 
@@ -17,40 +18,39 @@ def _run_epi_model(
 ):
     if epi_model_name is None:
         raise ValueError("epi_model_name must be provided.")
+    subset_all = DATASETS[dataset]["subset"]
     if years is None:
-        years = DATASETS[dataset]["subset"]["years"]
+        years = subset_all["years"]
     if realizations is None:
-        realizations = DATASETS[dataset]["subset"]["realizations"]
+        realizations = subset_all["realizations"]
+    years = np.atleast_1d(years)
     realizations = np.atleast_1d(realizations)
-    save_dir = pathlib.Path(__file__).parents[1] / f"results/{epi_model_name}/{dataset}"
+
     epi_model = epimod.get_example_model(epi_model_name)
-    ds_clim = xr.open_mfdataset(
-        str(DATASETS[dataset]["save_dir"] / "*.nc"),
-        data_vars="minimal",
-        coords="minimal",
-        compat="override",
-        chunks={},
-    )
-    ds_clim = ds_clim.sel(realization=realizations).isel(
-        time=ds_clim.time.dt.year.isin(years)
-    )
-    ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
-    datasets = [
-        ds_clim.sel(realization=[realization])
-        .isel(time=ds_clim.time.dt.year.isin([year]))
-        .climepi.run_epi_model(epi_model, return_yearly_portion_suitable=True)
-        for realization in realizations
-        for year in years
-    ]
-    paths = [
-        save_dir / f"{realization}_{year}.nc"
-        for realization in realizations
-        for year in years
-    ]
+
+    save_dir = pathlib.Path(__file__).parents[1] / f"results/{epi_model_name}/{dataset}"
     save_dir.mkdir(parents=True, exist_ok=True)
-    delayed_obj = xr.save_mfdataset(datasets, paths, compute=False)
-    with dask.diagnostics.ProgressBar():
-        delayed_obj.compute()
+
+    for year, realization in tqdm(
+        itertools.product(years, realizations),
+        total=len(years) * len(realizations),
+    ):
+        data_path = _data_path(dataset=dataset, realization=realization, year=year)
+        ds_clim = xr.open_dataset(data_path, chunks={})
+        ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
+        ds_epi = epi_model.run(ds_clim, return_yearly_portion_suitable=True)
+        save_path = save_dir / f"{realization}_{year}.nc"
+        ds_epi.to_netcdf(save_path)
+
+
+def _data_path(*, dataset, realization, year):
+    data_dir = DATASETS[dataset]["save_dir"]
+    if "downscaled" in dataset:
+        pattern = f"{dataset}_{realization}_{year}.nc"
+    else:
+        pattern = f"*_{year}_*_{realization}.nc"
+    (path,) = data_dir.glob(pattern)
+    return path
 
 
 if __name__ == "__main__":

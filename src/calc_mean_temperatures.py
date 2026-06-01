@@ -1,13 +1,15 @@
 import argparse
+import itertools
 import pathlib
 
 import climepi  # noqa
-import dask.diagnostics
 import numpy as np
 import xarray as xr
 import xcdat.spatial  # noqa
+from tqdm import tqdm
 
 from inputs import DATASETS
+from run_epi_model import _data_path
 
 
 def _calc_mean_temperatures(
@@ -15,43 +17,33 @@ def _calc_mean_temperatures(
     years=None,
     realizations=None,
 ):
+    subset_all = DATASETS[dataset]["subset"]
     if years is None:
-        years = DATASETS[dataset]["subset"]["years"]
+        years = subset_all["years"]
     if realizations is None:
-        realizations = DATASETS[dataset]["subset"]["realizations"]
+        realizations = subset_all["realizations"]
+    years = np.atleast_1d(years)
     realizations = np.atleast_1d(realizations)
+
     save_dir = (
         pathlib.Path(__file__).parents[1] / f"results/mean_temperatures/{dataset}"
     )
-    ds_clim = xr.open_mfdataset(
-        str(DATASETS[dataset]["save_dir"] / "*.nc"),
-        data_vars="minimal",
-        coords="minimal",
-        compat="override",
-        chunks={},
-    )
-    ds_clim = ds_clim.sel(realization=realizations).isel(
-        time=ds_clim.time.dt.year.isin(years)
-    )
-    ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
-    datasets = [
-        ds_clim.sel(realization=[realization])
-        .isel(time=ds_clim.time.dt.year.isin([year]))
-        .spatial.average("temperature")[["temperature"]]
-        .compute()
-        .climepi.yearly_average()
-        for realization in realizations
-        for year in years
-    ]
-    paths = [
-        save_dir / f"{realization}_{year}.nc"
-        for realization in realizations
-        for year in years
-    ]
     save_dir.mkdir(parents=True, exist_ok=True)
-    delayed_obj = xr.save_mfdataset(datasets, paths, compute=False)
-    with dask.diagnostics.ProgressBar():
-        delayed_obj.compute()
+
+    for year, realization in tqdm(
+        itertools.product(years, realizations),
+        total=len(years) * len(realizations),
+    ):
+        data_path = _data_path(dataset=dataset, realization=realization, year=year)
+        ds_clim = xr.open_dataset(data_path, chunks={})
+        ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
+        ds_mean = (
+            ds_clim.spatial.average("temperature")[["temperature"]]
+            .compute()
+            .climepi.yearly_average()
+        )
+        save_path = save_dir / f"{realization}_{year}.nc"
+        ds_mean.to_netcdf(save_path)
 
 
 if __name__ == "__main__":
