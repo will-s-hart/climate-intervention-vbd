@@ -194,6 +194,7 @@ cython_debug/
 .cursorindexingignore
 
 # Claude
+CLAUDE.local.md
 .claude
 
 # snakemake
