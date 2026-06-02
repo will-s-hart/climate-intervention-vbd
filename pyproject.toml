@@ -24,8 +24,6 @@ ruff = "*"
 ipykernel = "*"
 jupyter_bokeh = "*"
 
-[tool.pixi.feature.dev.pypi-dependencies]
-
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "prod" }
 prod = { features = [], solve-group = "prod" }
