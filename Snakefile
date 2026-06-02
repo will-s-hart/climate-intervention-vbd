@@ -1,5 +1,5 @@
 import re
-from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME
+from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME, get_batches
 
 EPI_MODELS = [EPI_MODEL_NAME, ALT_EPI_MODEL_NAME]
 
@@ -131,56 +131,108 @@ rule results:
         epi_result_files,
 
 
-rule download_data:
-    input:
-        "src/inputs.py",
-        "src/download_data.py",
-    output:
-        get_download_file("{dataset}", "{realization}", "{year}"),
-    shell:
-        """
-        pixi run python src/download_data.py \
-            --dataset {wildcards.dataset} \
-            --years {wildcards.year} \
-            --realizations {wildcards.realization}
-        """
+for dataset_name in DATASETS:
+    for batch_index, batch in enumerate(get_batches(dataset_name)):
 
+        rule:
+            name:
+                f"download_data_{dataset_name}_{batch_index}"
+            input:
+                "src/inputs.py",
+                "src/download_data.py",
+            output:
+                [
+                    get_download_file(dataset_name, realization, year)
+                    for realization in batch["realizations"]
+                    for year in batch["years"]
+                ],
+            log:
+                f"logs/download_data/{dataset_name}_batch{batch_index}.log",
+            params:
+                dataset=dataset_name,
+                years=batch["years"],
+                realizations=batch["realizations"],
+            shell:
+                """
+                pixi run python src/download_data.py \
+                    --dataset {params.dataset} \
+                    --years {params.years} \
+                    --realizations {params.realizations} \
+                    >{log} 2>&1
+                """
 
-rule calc_mean_temperatures:
-    input:
-        lambda wildcards: get_download_file(
-            wildcards.dataset, wildcards.realization, wildcards.year
-        ),
-        "src/inputs.py",
-        "src/calc_mean_temperatures.py",
-    output:
-        get_mean_temperature_file("{dataset}", "{realization}", "{year}"),
-    shell:
-        """
-        pixi run python src/calc_mean_temperatures.py \
-            --dataset {wildcards.dataset} \
-            --years {wildcards.year} \
-            --realizations {wildcards.realization}
-        """
+        rule:
+            name:
+                f"calc_mean_temperatures_{dataset_name}_{batch_index}"
+            input:
+                [
+                    get_download_file(dataset_name, realization, year)
+                    for realization in batch["realizations"]
+                    for year in batch["years"]
+                ],
+                "src/inputs.py",
+                "src/calc_mean_temperatures.py",
+            output:
+                [
+                    get_mean_temperature_file(dataset_name, realization, year)
+                    for realization in batch["realizations"]
+                    for year in batch["years"]
+                ],
+            log:
+                f"logs/calc_mean_temperatures/{dataset_name}_batch{batch_index}.log",
+            params:
+                dataset=dataset_name,
+                years=batch["years"],
+                realizations=batch["realizations"],
+            shell:
+                """
+                pixi run python src/calc_mean_temperatures.py \
+                    --dataset {params.dataset} \
+                    --years {params.years} \
+                    --realizations {params.realizations} \
+                    >{log} 2>&1
+                """
 
+        for epi_model_name in EPI_MODELS:
 
-rule run_epi_model:
-    input:
-        lambda wildcards: get_download_file(
-            wildcards.dataset, wildcards.realization, wildcards.year
-        ),
-        "src/inputs.py",
-        "src/run_epi_model.py",
-    output:
-        get_epi_result_file("{dataset}", "{realization}", "{year}", "{epi_model_name}"),
-    shell:
-        """
-        pixi run python src/run_epi_model.py \
-            --dataset {wildcards.dataset} \
-            --years {wildcards.year} \
-            --realizations {wildcards.realization} \
-            --epi-model-name {wildcards.epi_model_name}
-        """
+            rule:
+                name:
+                    f"run_epi_model_{epi_model_name}_{dataset_name}_{batch_index}"
+                input:
+                    [
+                        get_download_file(dataset_name, realization, year)
+                        for realization in batch["realizations"]
+                        for year in batch["years"]
+                    ],
+                    "src/inputs.py",
+                    "src/run_epi_model.py",
+                output:
+                    [
+                        get_epi_result_file(
+                            dataset_name, realization, year, epi_model_name
+                        )
+                        for realization in batch["realizations"]
+                        for year in batch["years"]
+                    ],
+                log:
+                    f"logs/run_epi_model/"
+                    f"{epi_model_name}_{dataset_name}_batch{batch_index}.log",
+                resources:
+                    mem_mb_per_cpu=16000,
+                params:
+                    dataset=dataset_name,
+                    years=batch["years"],
+                    realizations=batch["realizations"],
+                    epi_model_name=epi_model_name,
+                shell:
+                    """
+                    pixi run python src/run_epi_model.py \
+                        --dataset {params.dataset} \
+                        --years {params.years} \
+                        --realizations {params.realizations} \
+                        --epi-model-name {params.epi_model_name} \
+                        >{log} 2>&1
+                    """
 
 
 rule make_temperature_figure_data:
