@@ -4,6 +4,7 @@ import climepi  # noqa
 import geoviews.feature as gf
 import holoviews as hv
 import hvplot.pandas  # noqa
+import hvplot.xarray  # noqa
 import numpy as np
 import pandas as pd
 import xarray as xr
