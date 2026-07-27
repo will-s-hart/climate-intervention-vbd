@@ -29,12 +29,14 @@ def make_figure_panels(downscaled=False, epi_model_name=None, main_only=False):
     save_dir.mkdir(parents=True, exist_ok=True)
     # Fig 1 panels
     print("Making Fig 1 panels...")
-    make_current_plot(
-        data_path=data_dir / "current.nc", save_base_path=save_dir / "current"
-    )
     make_temperature_time_series_plot(
         data_path=data_dir.parent / "temperature_time_series.nc",
         save_base_path=save_dir / "temperature_time_series",
+    )
+    make_current_plot(
+        data_path=data_dir / "current.nc",
+        panel_label="B",
+        save_base_path=save_dir / "current",
     )
     # Fig 2 panels
     print("Making Fig 2 panels...")
@@ -114,13 +116,13 @@ def compile_figures(
     # Figure 1
     _combine_panels(
         panel_paths=[
-            panel_dir / "current.svg",
             panel_dir / "temperature_time_series.svg",
+            panel_dir / "current.svg",
         ],
         save_path=save_dir / f"figure_{figure_numbers[0]}.svg",
         tiling=(1, 2),
         panel_height=310,
-        offsets=[(0, 0), (0, -25)],
+        offsets=[(0, 0), (0, 15)],
     )
     # Figure 2
     _combine_panels(

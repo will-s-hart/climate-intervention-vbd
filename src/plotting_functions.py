@@ -55,7 +55,7 @@ def make_current_plot(
 
 def make_temperature_time_series_plot(
     data_path=None,
-    panel_label="B",
+    panel_label="A",
     save_base_path=None,
     **plot_kwargs,
 ):
@@ -425,7 +425,8 @@ def make_location_example_plots(
                     ),
                 }
                 p_curr *= (
-                    xr.concat(
+                    xr
+                    .concat(
                         [
                             ds_before_curr["before"].isel(time=-1),
                             ds_after_curr["after"],
