@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from bokeh.io import export_svg
-from bokeh.palettes import interp_palette
 from climepi._xcdat import BoundsAccessor, swap_lon_axis  # noqa
 from holoviews import opts
 from selenium.webdriver import Firefox, FirefoxOptions
@@ -237,130 +236,6 @@ def make_change_example_plots(
         _save_fig(plot, save_path=save_path)
 
 
-def make_change_summary_plots(
-    data_path=None,
-    thresholds=None,
-    panel_labels=None,
-    save_base_path=None,
-    **plot_kwargs,
-):
-    colors = interp_palette(["white", "crimson"], 11)
-    cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
-    plot_opts = {
-        **_get_plot_opts(map_plot=True),
-        "clim": (0, 100),
-        "cmap": cmap,
-        "cticks": list(range(0, 101, 10)),
-    }
-    ds = xr.open_dataset(data_path)
-    # before_year_range = ds.attrs["before_year_range"]
-    # after_year_range = ds.attrs["after_year_range"]
-    if thresholds is None:
-        thresholds = ds.threshold.values.tolist()
-    if panel_labels is None:
-        panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(thresholds)]
-    p_list = []
-    for threshold, panel_label in zip(thresholds, panel_labels):
-        p_curr = _make_map_plot(
-            ds.sel(threshold=threshold),
-            plot_var="percent_realizations_increasing",
-            **{
-                "title": f"{panel_label}. {threshold}-day threshold",
-                "clabel": "Percentage of ensemble members",
-                **plot_kwargs,
-            },
-        )
-        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
-        p_list.append(p_curr)
-    for plot, name in zip(
-        p_list, [f"threshold_{threshold}" for threshold in thresholds]
-    ):
-        save_path = f"{save_base_path}_{name}.svg"
-        _save_fig(plot, save_path=save_path)
-
-
-def make_trend_example_plots(
-    data_path=None,
-    realizations=None,
-    panel_labels=None,
-    save_base_path=None,
-    **plot_kwargs,
-):
-    plot_opts = {
-        **_get_plot_opts(map_plot=True),
-        "symmetric": True,
-        "cmap": "bwr",
-        "clabel": "Change in mean days suitable",
-    }
-    ds = xr.open_dataset(data_path)
-    after_year_range = ds.attrs["after_year_range"]
-    if realizations is None:
-        realizations = ds.realization.values.tolist()
-    if panel_labels is None:
-        panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(realizations)]
-    max_change = np.abs(ds["trend_change"].values).max()
-    p_ex_list = []
-    for realization, panel_label in zip(realizations, panel_labels):
-        member_id = f"{realization + 1:03d}"
-        p_curr = _make_map_plot(
-            ds.sel(realization=realization),
-            plot_var="trend_change",
-            **{
-                "title": f"{panel_label}. ID {member_id} (trend change, {after_year_range})",
-                "clim": (-max_change, max_change),
-                **plot_kwargs,
-            },
-        )
-        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
-        p_ex_list.append(p_curr)
-    for plot, realization in zip(p_ex_list, realizations):
-        member_id = f"{realization + 1:03d}"
-        save_path = f"{save_base_path}_ID_{member_id}.svg"
-        _save_fig(plot, save_path=save_path)
-
-
-def make_trend_summary_plots(
-    data_path=None,
-    thresholds=None,
-    panel_labels=None,
-    save_base_path=None,
-    **plot_kwargs,
-):
-    colors = interp_palette(["white", "crimson"], 11)
-    cmap = [colors[0]] + [c for c in colors[1:-1] for _ in (0, 1)] + [colors[-1]]
-    plot_opts = {
-        **_get_plot_opts(map_plot=True),
-        "clim": (0, 100),
-        "cmap": cmap,
-        "cticks": list(range(0, 101, 10)),
-    }
-    ds = xr.open_dataset(data_path)
-    after_year_range = ds.attrs["after_year_range"]
-    if thresholds is None:
-        thresholds = ds.threshold.values.tolist()
-    if panel_labels is None:
-        panel_labels = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(thresholds)]
-    p_list = []
-    for threshold, panel_label in zip(thresholds, panel_labels):
-        p_curr = _make_map_plot(
-            ds.sel(threshold=threshold),
-            plot_var="percent_realizations_increasing",
-            **{
-                "title": f"{panel_label}. Increasing trend "
-                f"({after_year_range}, {threshold} day threshold)",
-                "clabel": "Percentage of ensemble members",
-                **plot_kwargs,
-            },
-        )
-        p_curr = p_curr.opts(opts.Image(**plot_opts), clone=True)
-        p_list.append(p_curr)
-    for plot, name in zip(
-        p_list, [f"threshold_{threshold}" for threshold in thresholds]
-    ):
-        save_path = f"{save_base_path}_{name}.svg"
-        _save_fig(plot, save_path=save_path)
-
-
 def make_location_example_plots(
     data_path=None,
     locations=None,
@@ -425,8 +300,7 @@ def make_location_example_plots(
                     ),
                 }
                 p_curr *= (
-                    xr
-                    .concat(
+                    xr.concat(
                         [
                             ds_before_curr["before"].isel(time=-1),
                             ds_after_curr["after"],

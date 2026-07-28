@@ -1,11 +1,25 @@
-import re
 from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME, get_batches
 
 EPI_MODELS = [EPI_MODEL_NAME, ALT_EPI_MODEL_NAME]
 
+# Figure data products generated for both epi models, and those generated only for the
+# primary (EPI_MODEL_NAME) model
+COMMON_FIGURE_DATA_NAMES = [
+    "mean",
+    "change_example",
+    "location",
+]
+PRIMARY_FIGURE_DATA_NAMES = [
+    "current",
+    "later_mean",
+    "even_later_mean",
+    "change_example_others",
+    "location_others",
+]
+
 
 wildcard_constraints:
-    epi_model_name="|".join(re.escape(m) for m in EPI_MODELS),
+    native_or_downscaled="native|downscaled",
 
 
 def get_download_file(dataset, realization, year):
@@ -25,19 +39,12 @@ def get_temperature_figure_data_file(native_or_downscaled):
 
 
 def get_figure_data_files(epi_model_name, native_or_downscaled):
+    analyses = COMMON_FIGURE_DATA_NAMES + (
+        PRIMARY_FIGURE_DATA_NAMES if epi_model_name == EPI_MODEL_NAME else []
+    )
     return [
         f"results/figure_data/{native_or_downscaled}/{epi_model_name}/{analysis}.nc"
-        for analysis in [
-            "current",
-            "mean",
-            "change_example",
-            "location",
-            "later_mean",
-            "even_later_mean",
-            "change_example_others",
-            "location_others",
-            "change_summary",
-        ]
+        for analysis in analyses
     ]
 
 
@@ -55,8 +62,6 @@ def get_figure_files(native_or_downscaled):
             "figure_S4",
             "figure_S5",
             "figure_S6",
-            "figure_S7",
-            "figure_S8",
         ]
     ]
 
@@ -245,6 +250,7 @@ rule make_temperature_figure_data:
                 == (wildcards.native_or_downscaled == "downscaled")
             )
         ],
+        "src/inputs.py",
         "src/make_figure_data.py",
         "src/figure_data_functions.py",
     output:
@@ -259,29 +265,40 @@ rule make_temperature_figure_data:
         "pixi run python src/make_figure_data.py {params.opts}"
 
 
-rule make_figure_data:
-    input:
-        lambda wildcards: [
-            file
-            for file in epi_result_files
-            if wildcards.epi_model_name in file
-            and (
-                ("downscaled" in file)
-                == (wildcards.native_or_downscaled == "downscaled")
-            )
-        ],
-        "src/make_figure_data.py",
-        "src/figure_data_functions.py",
-    output:
-        get_figure_data_files("{epi_model_name}", "{native_or_downscaled}"),
-    params:
-        opts=lambda wildcards: (
-            f"--downscaled --epi-model-name {wildcards.epi_model_name}"
-            if wildcards.native_or_downscaled == "downscaled"
-            else f"--epi-model-name {wildcards.epi_model_name}"
-        ),
-    shell:
-        "pixi run python src/make_figure_data.py {params.opts}"
+for epi_model_name in EPI_MODELS:
+
+    rule:
+        name:
+            f"make_figure_data_{epi_model_name}"
+        input:
+            # epi_model_name bound as a default argument so each generated rule keeps
+            # its own model rather than closing over the loop variable
+            lambda wildcards, epi_model_name=epi_model_name: [
+                file
+                for file in epi_result_files
+                if epi_model_name in file
+                and (
+                    ("downscaled" in file)
+                    == (wildcards.native_or_downscaled == "downscaled")
+                )
+            ],
+            "src/inputs.py",
+            "src/make_figure_data.py",
+            "src/figure_data_functions.py",
+        output:
+            get_figure_data_files(epi_model_name, "{native_or_downscaled}"),
+        params:
+            epi_model_name=epi_model_name,
+            downscaled_flag=lambda wildcards: (
+                "--downscaled"
+                if wildcards.native_or_downscaled == "downscaled"
+                else ""
+            ),
+        shell:
+            """
+            pixi run python src/make_figure_data.py {params.downscaled_flag} \
+                --epi-model-name {params.epi_model_name}
+            """
 
 
 rule make_figures:
@@ -291,6 +308,7 @@ rule make_figures:
             for file in figure_data_files
             if (wildcards.native_or_downscaled in file)
         ],
+        "data/arbo_occ_thinned.csv",
         "src/inputs.py",
         "src/make_figures.py",
         "src/plotting_functions.py",

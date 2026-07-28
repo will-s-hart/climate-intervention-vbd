@@ -5,11 +5,11 @@ import xarray as xr
 
 from figure_data_functions import (
     make_change_example_plot_data,
-    make_change_summary_plot_data,
     make_location_example_plot_data,
     make_mean_plot_data,
     make_temperature_time_series_plot_data,
 )
+from inputs import EPI_MODEL_NAME
 
 
 def _make_temperature_figure_data(downscaled=False):
@@ -45,7 +45,7 @@ def _make_temperature_figure_data(downscaled=False):
     )
 
 
-def _make_figure_data(downscaled=False, epi_model_name=None):
+def _make_epi_figure_data(downscaled=False, epi_model_name=None):
     save_dir = (
         pathlib.Path(__file__).parents[1]
         / f"results/figure_data/{'downscaled' if downscaled else 'native'}/"
@@ -74,8 +74,31 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
         coords="minimal",
         compat="override",
     )
-    # Fig 1 data
-    print("Making Fig 1 data...")
+    # Data generated for both epi models
+    print("Making mean data...")
+    make_mean_plot_data(
+        ds_control=ds_control,
+        ds_feedback=ds_feedback,
+        save_path=save_dir / "mean.nc",
+    )
+    print("Making change example data...")
+    make_change_example_plot_data(
+        ds_control=ds_control,
+        ds_feedback=ds_feedback,
+        realizations=[0, 1, 5, 6],
+        save_path=save_dir / "change_example.nc",
+    )
+    print("Making location example data...")
+    make_location_example_plot_data(
+        ds_control=ds_control,
+        ds_feedback=ds_feedback,
+        locations=["London", "Seattle", "Cape Town", "Santiago de Chile"],
+        save_path=save_dir / "location.nc",
+    )
+    if epi_model_name != EPI_MODEL_NAME:
+        return
+    # Data generated only for the primary epi model
+    print("Making current data...")
     make_mean_plot_data(
         ds_control=ds_control,
         ds_feedback=None,
@@ -83,31 +106,7 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
         after_years=None,
         save_path=save_dir / "current.nc",
     )
-    # Fig 2 data
-    print("Making Fig 2 data...")
-    make_mean_plot_data(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        save_path=save_dir / "mean.nc",
-    )
-    # Fig 3 data
-    print("Making Fig 3 data...")
-    make_change_example_plot_data(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        realizations=[0, 1, 5, 6],
-        save_path=save_dir / "change_example.nc",
-    )
-    # Fig 4 data
-    print("Making Fig 4 data...")
-    make_location_example_plot_data(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        locations=["London", "Seattle", "Cape Town", "Santiago de Chile"],
-        save_path=save_dir / "location.nc",
-    )
-    # Fig S1 data
-    print("Making Fig S1 data...")
+    print("Making later mean data...")
     make_mean_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
@@ -120,16 +119,14 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
         after_years=range(2055, 2065),
         save_path=save_dir / "even_later_mean.nc",
     )
-    # Fig S2 data
-    print("Making Fig S2 data...")
+    print("Making change example (other realizations) data...")
     make_change_example_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
         realizations=[2, 3, 4, 7, 8, 9],
         save_path=save_dir / "change_example_others.nc",
     )
-    # Fig S3 data
-    print("Making Fig S3 data...")
+    print("Making location example (other locations) data...")
     make_location_example_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
@@ -142,14 +139,6 @@ def _make_figure_data(downscaled=False, epi_model_name=None):
             "Tokyo",
         ],
         save_path=save_dir / "location_others.nc",
-    )
-    # Fig S4 data
-    print("Making Fig S4 data...")
-    make_change_summary_plot_data(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        thresholds=[1, 15],
-        save_path=save_dir / "change_summary.nc",
     )
 
 
@@ -177,7 +166,7 @@ if __name__ == "__main__":
     if args.temperature:
         _make_temperature_figure_data(downscaled=args.downscaled)
     if args.epi_model_name:
-        _make_figure_data(
+        _make_epi_figure_data(
             downscaled=args.downscaled, epi_model_name=args.epi_model_name
         )
     elif not args.temperature:
