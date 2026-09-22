@@ -1,4 +1,5 @@
 import pathlib
+import tempfile
 
 import climepi  # noqa
 import geoviews.feature as gf
@@ -8,7 +9,9 @@ import hvplot.xarray  # noqa
 import numpy as np
 import pandas as pd
 import xarray as xr
-from bokeh.io import export_svg
+from bokeh.io import curdoc
+from bokeh.io.export import get_layout_html, wait_until_render_complete
+from bokeh.models import ColorBar
 from climepi._xcdat import BoundsAccessor, swap_lon_axis  # noqa
 from holoviews import opts
 from selenium.webdriver import Firefox, FirefoxOptions
@@ -18,6 +21,25 @@ from webdriver_manager.firefox import GeckoDriverManager
 WEBDRIVER_SERVICE = FirefoxService(GeckoDriverManager().install())
 WEBDRIVER_OPTIONS = FirefoxOptions()
 WEBDRIVER_OPTIONS.add_argument("--headless")
+
+# Bokeh passes ColorBar.title_text_align to the colour bar's internal title as
+# text_align, which titles ignore (https://github.com/bokeh/bokeh/issues/14149), so
+# pass it on as align before exporting. Bokeh 4 adds colour bar title alignment options
+# (https://github.com/bokeh/bokeh/pull/14152), which should make this workaround
+# removable in favour of export_svg.
+EXPORT_SVG_SCRIPT = """
+let n_aligned = 0
+for (const view of Bokeh.index.query((view) => view.model.type == "ColorBar")) {
+  for (const child of view.children()) {
+    if (child.model.type == "Title") {
+      child.model.align = view.model.title_text_align
+      n_aligned++
+    }
+  }
+}
+const [root_view] = Bokeh.index
+return [n_aligned, root_view.export("svg").ctx.get_serialized_svg(true)]
+"""
 
 
 def make_current_plot(
@@ -350,10 +372,21 @@ def _make_map_plot(ds, plot_var, **kwargs):
 
 
 def _save_fig(plot, save_path=None):
-    with Firefox(options=WEBDRIVER_OPTIONS, service=WEBDRIVER_SERVICE) as driver:
-        bokeh_plot = hv.render(plot, backend="bokeh")
-        bokeh_plot.sizing_mode = None  # stops warnings about width/height not being set
-        export_svg(bokeh_plot, filename=save_path, webdriver=driver)
+    bokeh_plot = hv.render(plot, backend="bokeh")
+    bokeh_plot.sizing_mode = None  # stops warnings about width/height not being set
+    html = get_layout_html(bokeh_plot, theme=curdoc().theme)
+    with (
+        tempfile.TemporaryDirectory() as tmp_dir,
+        Firefox(options=WEBDRIVER_OPTIONS, service=WEBDRIVER_SERVICE) as driver,
+    ):
+        html_path = pathlib.Path(tmp_dir) / "plot.html"
+        html_path.write_text(html, encoding="utf-8")
+        driver.get(html_path.as_uri())
+        wait_until_render_complete(driver, timeout=5)
+        n_aligned, svg = driver.execute_script(EXPORT_SVG_SCRIPT)
+    if n_aligned != len(bokeh_plot.select(type=ColorBar)):
+        raise RuntimeError(f"Could not align colour bar titles in {save_path}")
+    pathlib.Path(save_path).write_text(svg, encoding="utf-8")
 
 
 def _get_plot_opts(extra_title_offset=False, map_plot=False, title_offset=None):
@@ -377,6 +410,7 @@ def _get_plot_opts(extra_title_offset=False, map_plot=False, title_offset=None):
     if map_plot:
         plot_opts["colorbar_opts"] = {
             "title_text_font_style": "normal",
+            "title_text_align": "center",
             "title_standoff": 10,
             "padding": 5,
         }
