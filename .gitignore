@@ -203,9 +203,6 @@ CLAUDE.local.md
 # OS generated files
 .DS_Store
 
-# Scripts for cluster workflows
-cluster/
-
 # Logs
 logs/
 
