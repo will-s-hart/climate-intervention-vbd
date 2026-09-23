@@ -137,6 +137,12 @@ def _make_epi_figure_data(downscaled=False, epi_model_name=None):
             "New Delhi",
             "Hanoi",
             "Tokyo",
+            "Rome",
+            "Sao Paulo",
+            "Porto Alegre",
+            "Buenos Aires",
+            "Milan",
+            "Marseille",
         ],
         save_path=save_dir / "location_others.nc",
     )
