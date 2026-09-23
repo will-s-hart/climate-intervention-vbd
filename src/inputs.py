@@ -31,6 +31,10 @@ DATASETS = {
             "realizations": list(range(10)),
         },
         "save_dir": DATA_DIR / "arise_control_downscaled",
+        # Format spec, relative to the raw data root (config key downscaled_raw_dir)
+        "raw_path_template": (
+            "SSP245/bc_TREFHT_SSP245_ens{ensemble_member:03d}_{year}.nc"
+        ),
     },
     "arise_feedback_downscaled": {
         "subset": {
@@ -39,6 +43,10 @@ DATASETS = {
             "realizations": list(range(10)),
         },
         "save_dir": DATA_DIR / "arise_feedback_downscaled",
+        "raw_path_template": (
+            "ARISE-1.5K/bc_TREFHT_SSP245_MERGED_ARISE_1.5_ens{ensemble_member:03d}_"
+            "{year}.nc"
+        ),
     },
 }
 
@@ -64,6 +72,32 @@ def get_batches(dataset):
             realization_chunks, year_chunks
         )
     ]
+
+
+def get_climate_data_path(dataset, realization, year):
+    """Path to the climate data for a single realization and year.
+
+    Native files are named by climepi, so are found by globbing; downscaled files
+    are written under exactly this name when the raw data is formatted.
+    """
+    data_dir = DATASETS[dataset]["save_dir"]
+    if "downscaled" in dataset:
+        return data_dir / f"{dataset}_{realization}_{year}.nc"
+    (path,) = data_dir.glob(f"*_{year}_*_{realization}.nc")
+    return path
+
+
+def get_downscaled_raw_data_path(dataset, realization, year, downscaled_raw_dir):
+    """Path to the raw file a downscaled dataset is formatted from.
+
+    downscaled_raw_dir is the root of the (not publicly available) raw downscaled
+    data; the dataset's "raw_path_template" gives the path beneath it.
+    """
+    # Raw ensemble members are numbered from 1, realizations from 0
+    raw_path_template = DATASETS[dataset]["raw_path_template"]
+    return pathlib.Path(downscaled_raw_dir) / raw_path_template.format(
+        ensemble_member=realization + 1, year=year
+    )
 
 
 def _chunks(values, chunk_size):

@@ -209,3 +209,5 @@ cluster/
 # Logs
 logs/
 
+# Machine-specific Snakemake config (e.g. downscaled_raw_dir)
+config.local.yaml

@@ -1,4 +1,22 @@
-from src.inputs import DATASETS, EPI_MODEL_NAME, ALT_EPI_MODEL_NAME, get_batches
+import pathlib
+
+from snakemake.exceptions import WorkflowError
+
+from src.inputs import (
+    DATASETS,
+    EPI_MODEL_NAME,
+    ALT_EPI_MODEL_NAME,
+    get_batches,
+    get_downscaled_raw_data_path,
+)
+
+# Gitignored machine-specific settings; currently only downscaled_raw_dir, the root of
+# the (not publicly available) raw downscaled data. --config overrides it.
+LOCAL_CONFIG_PATH = pathlib.Path("config.local.yaml")
+if LOCAL_CONFIG_PATH.exists():
+
+    configfile: LOCAL_CONFIG_PATH
+
 
 EPI_MODELS = [EPI_MODEL_NAME, ALT_EPI_MODEL_NAME]
 
@@ -20,6 +38,22 @@ PRIMARY_FIGURE_DATA_NAMES = [
 
 wildcard_constraints:
     native_or_downscaled="native|downscaled",
+
+
+def get_downscaled_raw_dir():
+    downscaled_raw_dir = config.get("downscaled_raw_dir")
+    if downscaled_raw_dir is None:
+        raise WorkflowError(
+            "The downscaled datasets are formatted from raw downscaled data, whose "
+            "location is not set. Create config.local.yaml containing\n"
+            "    downscaled_raw_dir: /path/to/raw/downscaled/data\n"
+            "or pass --config downscaled_raw_dir=/path/to/raw/downscaled/data. "
+            "Without that data, build the native-resolution figures only with the "
+            "`native` target."
+        )
+    # Relative paths are left as given; Snakemake resolves them against the working
+    # directory, which is also where the jobs run
+    return pathlib.Path(downscaled_raw_dir).expanduser()
 
 
 def get_download_file(dataset, realization, year):
@@ -110,6 +144,17 @@ rule all:
         figure_files,
 
 
+# Needs no downscaled data, so builds without downscaled_raw_dir set
+rule native:
+    input:
+        get_figure_files("native"),
+
+
+rule downscaled:
+    input:
+        get_figure_files("downscaled"),
+
+
 rule figures_png:
     input:
         figure_files,
@@ -141,10 +186,29 @@ for dataset_name in DATASETS:
 
         rule:
             name:
-                f"download_data_{dataset_name}_{batch_index}"
+                f"download_and_format_data_{dataset_name}_{batch_index}"
             input:
                 "src/inputs.py",
-                "src/download_data.py",
+                "src/download_and_format_data.py",
+                # Downscaled datasets are formatted from raw files; dataset_name and
+                # batch bound as default arguments so each generated rule keeps its
+                # own rather than closing over the loop variables
+                downscaled_raw_data=(
+                    lambda wildcards, dataset_name=dataset_name, batch=batch: (
+                        [
+                            get_downscaled_raw_data_path(
+                                dataset_name,
+                                realization,
+                                year,
+                                get_downscaled_raw_dir(),
+                            )
+                            for realization in batch["realizations"]
+                            for year in batch["years"]
+                        ]
+                        if "downscaled" in dataset_name
+                        else []
+                    )
+                ),
             output:
                 [
                     get_download_file(dataset_name, realization, year)
@@ -152,17 +216,23 @@ for dataset_name in DATASETS:
                     for year in batch["years"]
                 ],
             log:
-                f"logs/download_data/{dataset_name}_batch{batch_index}.log",
+                f"logs/download_and_format_data/{dataset_name}_batch{batch_index}.log",
             params:
                 dataset=dataset_name,
                 years=batch["years"],
                 realizations=batch["realizations"],
+                opts=lambda wildcards, dataset_name=dataset_name: (
+                    f"--downscaled-raw-dir {get_downscaled_raw_dir()}"
+                    if "downscaled" in dataset_name
+                    else ""
+                ),
             shell:
                 """
-                pixi run python src/download_data.py \
+                pixi run python src/download_and_format_data.py \
                     --dataset {params.dataset} \
                     --years {params.years} \
                     --realizations {params.realizations} \
+                    {params.opts} \
                     >{log} 2>&1
                 """
 

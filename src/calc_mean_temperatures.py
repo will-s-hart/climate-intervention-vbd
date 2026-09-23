@@ -8,8 +8,7 @@ import xarray as xr
 import xcdat.spatial  # noqa
 from tqdm import tqdm
 
-from inputs import DATASETS
-from run_epi_model import _data_path
+from inputs import DATASETS, get_climate_data_path
 
 
 def _calc_mean_temperatures(
@@ -34,7 +33,7 @@ def _calc_mean_temperatures(
         itertools.product(years, realizations),
         total=len(years) * len(realizations),
     ):
-        data_path = _data_path(dataset=dataset, realization=realization, year=year)
+        data_path = get_climate_data_path(dataset, realization, year)
         ds_clim = xr.open_dataset(data_path, chunks={})
         ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
         ds_mean = (

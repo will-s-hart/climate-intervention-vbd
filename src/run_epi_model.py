@@ -7,7 +7,7 @@ import xarray as xr
 from climepi import epimod
 from tqdm import tqdm
 
-from inputs import DATASETS
+from inputs import DATASETS, get_climate_data_path
 
 
 def _run_epi_model(
@@ -35,22 +35,12 @@ def _run_epi_model(
         itertools.product(years, realizations),
         total=len(years) * len(realizations),
     ):
-        data_path = _data_path(dataset=dataset, realization=realization, year=year)
+        data_path = get_climate_data_path(dataset, realization, year)
         ds_clim = xr.open_dataset(data_path, chunks={})
         ds_clim.time_bnds.load()  # Load time bounds to avoid encoding issues
         ds_epi = epi_model.run(ds_clim, return_yearly_portion_suitable=True)
         save_path = save_dir / f"{realization}_{year}.nc"
         ds_epi.to_netcdf(save_path)
-
-
-def _data_path(*, dataset, realization, year):
-    data_dir = DATASETS[dataset]["save_dir"]
-    if "downscaled" in dataset:
-        pattern = f"{dataset}_{realization}_{year}.nc"
-    else:
-        pattern = f"*_{year}_*_{realization}.nc"
-    (path,) = data_dir.glob(pattern)
-    return path
 
 
 if __name__ == "__main__":
