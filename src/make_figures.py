@@ -35,6 +35,7 @@ def make_common_panels(downscaled=False, epi_model_name=None):
     make_location_example_plots(
         data_path=data_dir / "location.nc",
         highlight_realization=0,
+        ylim_range=120,
         save_base_path=panel_dir / "location",
     )
 
@@ -74,12 +75,6 @@ def make_primary_panels(downscaled=False):
         save_base_path=panel_dir / "change_example_others",
         panel_labels=["A", "C", "E", "B", "D", "F"],
         clim=(-30, 30),
-    )
-    print("Making location example (other locations) panels...")
-    make_location_example_plots(
-        data_path=data_dir / "location_others.nc",
-        highlight_realization=0,
-        save_base_path=panel_dir / "location_others",
     )
 
 
@@ -122,10 +117,10 @@ def compile_common_figures(
     # Location time series
     _combine_panels(
         panel_paths=[
-            panel_dir / "location_london.svg",
-            panel_dir / "location_seattle.svg",
-            panel_dir / "location_cape_town.svg",
-            panel_dir / "location_santiago_de_chile.svg",
+            panel_dir / "location_paris.svg",
+            panel_dir / "location_los_angeles.svg",
+            panel_dir / "location_sao_paulo.svg",
+            panel_dir / "location_new_delhi.svg",
         ],
         save_path=save_dir / f"figure_{location_figure_number}.svg",
         panel_width=580,
@@ -141,7 +136,6 @@ def compile_primary_figures(
     current_figure_number,
     later_mean_figure_number,
     change_example_others_figure_number,
-    location_others_figure_number,
 ):
     save_dir = _get_figure_dir(downscaled=downscaled)
     panel_dir = _get_panel_dir(downscaled=downscaled, epi_model_name=EPI_MODEL_NAME)
@@ -181,27 +175,6 @@ def compile_primary_figures(
         ],
         save_path=save_dir / f"figure_{change_example_others_figure_number}.svg",
         tiling=(2, 3),
-    )
-    # Location time series for the other locations
-    _combine_panels(
-        panel_paths=[
-            panel_dir / "location_others_paris.svg",
-            panel_dir / "location_others_los_angeles.svg",
-            panel_dir / "location_others_addis_ababa.svg",
-            panel_dir / "location_others_new_delhi.svg",
-            panel_dir / "location_others_hanoi.svg",
-            panel_dir / "location_others_tokyo.svg",
-            panel_dir / "location_others_rome.svg",
-            panel_dir / "location_others_sao_paulo.svg",
-            panel_dir / "location_others_porto_alegre.svg",
-            panel_dir / "location_others_buenos_aires.svg",
-            panel_dir / "location_others_milan.svg",
-            panel_dir / "location_others_marseille.svg",
-        ],
-        save_path=save_dir / f"figure_{location_others_figure_number}.svg",
-        tiling=(2, 6),
-        panel_height=330,
-        panel_width=580,
     )
 
 
@@ -271,7 +244,6 @@ if __name__ == "__main__":
         current_figure_number=1,
         later_mean_figure_number="S1",
         change_example_others_figure_number="S2",
-        location_others_figure_number="S3",
     )
     compile_common_figures(
         downscaled=args.downscaled,
@@ -283,7 +255,7 @@ if __name__ == "__main__":
     compile_common_figures(
         downscaled=args.downscaled,
         epi_model_name=ALT_EPI_MODEL_NAME,
-        mean_figure_number="S4",
-        change_example_figure_number="S5",
-        location_figure_number="S6",
+        mean_figure_number="S3",
+        change_example_figure_number="S4",
+        location_figure_number="S5",
     )

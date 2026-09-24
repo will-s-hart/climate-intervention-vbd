@@ -1,5 +1,7 @@
 import pathlib
 import tempfile
+import unicodedata
+import warnings
 
 import climepi  # noqa
 import geoviews.feature as gf
@@ -263,12 +265,14 @@ def make_location_example_plots(
     locations=None,
     highlight_realization=None,
     panel_labels=None,
+    ylim_range=None,
     save_base_path=None,
     **plot_kwargs,
 ):
+    # With ylim_range, every panel's y-axis spans that many days so the panels share a
+    # scale (see _get_shared_scale_ylim_opts); without, each starts at zero
     plot_opts = {
         **_get_plot_opts(extra_title_offset=True),
-        "ylim": (0, None),
         "xlabel": "Year",
         "ylabel": "Days suitable for transmission",
     }
@@ -284,6 +288,11 @@ def make_location_example_plots(
     colors = hv.Cycle().values
     p_list = []
     for location, panel_label in zip(locations, panel_labels):
+        ylim_opts = (
+            {"ylim": (0, None)}
+            if ylim_range is None
+            else _get_shared_scale_ylim_opts(ds.sel(location=location), ylim_range)
+        )
         p_curr = hv.VLine(ds.time.values[0]).opts(
             line_color="black", line_dash="dashed", clone=True
         )
@@ -299,10 +308,15 @@ def make_location_example_plots(
             ds_before_curr = ds_before.sel(realization=realization, location=location)
             p_curr *= ds_before_curr.climepi.plot_time_series(
                 "before", **before_plot_kwargs
-            ).opts(title=f"{panel_label}. {location}", **plot_opts, clone=True)
+            ).opts(
+                title=f"{panel_label}. {location}",
+                **ylim_opts,
+                **plot_opts,
+                clone=True,
+            )
             if highlight:
                 p_curr *= ds_before_curr.climepi.plot_time_series(
-                    "before", **{"line_dash": "dashed", **before_plot_kwargs}
+                    "before_trend", **{"line_dash": "dashed", **before_plot_kwargs}
                 )
             for realization_, member_id_, color in zip(
                 realization_pair,
@@ -342,11 +356,42 @@ def make_location_example_plots(
                     p_curr *= ds_after_curr.climepi.plot_time_series(
                         "after_trend", **after_trend_plot_kwargs
                     )
-        p_curr = p_curr.opts(legend_position="bottom_right", clone=True)
+        # The legend is the same in every panel, so only the first shows it
+        p_curr = p_curr.opts(
+            legend_position="bottom_right",
+            show_legend=location == locations[0],
+            clone=True,
+        )
         p_list.append(p_curr)
     for plot, location in zip(p_list, locations):
-        save_path = f"{save_base_path}_{location.lower().replace(' ', '_')}.svg"
+        # ASCII file names (e.g. sao_paulo for São Paulo) sync safely between systems
+        file_name = (
+            unicodedata.normalize("NFKD", location)
+            .encode("ascii", "ignore")
+            .decode()
+            .lower()
+            .replace(" ", "_")
+        )
+        save_path = f"{save_base_path}_{file_name}.svg"
         _save_fig(plot, save_path=save_path)
+
+
+def _get_shared_scale_ylim_opts(ds_location, ylim_range, step=30):
+    # Y-axis limits spanning ylim_range days, with ticks every step days. The upper
+    # limit is the lowest multiple of step above the data, but at least ylim_range, so
+    # the lower limit is never negative. Data too spread out to fit is clipped below.
+    data_min = min(ds_location[var].min().item() for var in ds_location.data_vars)
+    data_max = max(ds_location[var].max().item() for var in ds_location.data_vars)
+    upper = max(int(data_max // step + 1) * step, ylim_range)
+    lower = upper - ylim_range
+    if data_min < lower:
+        warnings.warn(
+            f"{ds_location.location.item()} data ({data_min:g} to {data_max:g} days) "
+            f"does not fit a y-axis range of {ylim_range} days, so is clipped below "
+            f"{lower}.",
+            stacklevel=2,
+        )
+    return {"ylim": (lower, upper), "yticks": list(range(lower, upper + 1, step))}
 
 
 def _make_map_plot(ds, plot_var, **kwargs):

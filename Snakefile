@@ -32,7 +32,6 @@ PRIMARY_FIGURE_DATA_NAMES = [
     "later_mean",
     "even_later_mean",
     "change_example_others",
-    "location_others",
 ]
 
 
@@ -95,7 +94,6 @@ def get_figure_files(native_or_downscaled):
             "figure_S3",
             "figure_S4",
             "figure_S5",
-            "figure_S6",
         ]
     ]
 

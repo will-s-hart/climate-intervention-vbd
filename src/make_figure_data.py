@@ -92,7 +92,7 @@ def _make_epi_figure_data(downscaled=False, epi_model_name=None):
     make_location_example_plot_data(
         ds_control=ds_control,
         ds_feedback=ds_feedback,
-        locations=["London", "Seattle", "Cape Town", "Santiago de Chile"],
+        locations=["Paris", "Los Angeles", "São Paulo", "New Delhi"],
         save_path=save_dir / "location.nc",
     )
     if epi_model_name != EPI_MODEL_NAME:
@@ -125,26 +125,6 @@ def _make_epi_figure_data(downscaled=False, epi_model_name=None):
         ds_feedback=ds_feedback,
         realizations=[2, 3, 4, 7, 8, 9],
         save_path=save_dir / "change_example_others.nc",
-    )
-    print("Making location example (other locations) data...")
-    make_location_example_plot_data(
-        ds_control=ds_control,
-        ds_feedback=ds_feedback,
-        locations=[
-            "Paris",
-            "Los Angeles",
-            "Addis Ababa",
-            "New Delhi",
-            "Hanoi",
-            "Tokyo",
-            "Rome",
-            "Sao Paulo",
-            "Porto Alegre",
-            "Buenos Aires",
-            "Milan",
-            "Marseille",
-        ],
-        save_path=save_dir / "location_others.nc",
     )
 
 
