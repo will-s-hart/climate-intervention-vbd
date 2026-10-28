@@ -75,6 +75,13 @@ def _format_downscaled_file(
         )
     pathlib.Path(save_path).parent.mkdir(parents=True, exist_ok=True)
     ds = xr.open_dataset(raw_path, chunks={})
+    if len(ds.data_vars) != 1:
+        raise ValueError(
+            f"Expected a single (temperature) data variable in {raw_path}, found "
+            f"{list(ds.data_vars)}."
+        )
+    (name,) = ds.data_vars
+    # Some raw files date every year as 2010, so the time is rebuilt for all
     ds = ds.assign_coords(
         time=xr.date_range(
             start=f"{year}-01-01", periods=365, freq="D", calendar="noleap"
@@ -87,7 +94,7 @@ def _format_downscaled_file(
     }
     ds = ds.rename({"latitude": "lat", "longitude": "lon"})
     ds = ds.bounds.add_missing_bounds()
-    ds = ds.assign(temperature=(ds["VAR_2T"] - 273.15)).drop_vars("VAR_2T")
+    ds = ds.assign(temperature=(ds[name] - 273.15)).drop_vars(name)
     ds["temperature"] = (
         ds["temperature"]
         .expand_dims(realization=[realization], scenario=[scenario])
