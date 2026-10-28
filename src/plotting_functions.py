@@ -376,22 +376,31 @@ def make_location_example_plots(
         _save_fig(plot, save_path=save_path)
 
 
-def _get_shared_scale_ylim_opts(ds_location, ylim_range, step=30):
-    # Y-axis limits spanning ylim_range days, with ticks every step days. The upper
-    # limit is the lowest multiple of step above the data, but at least ylim_range, so
-    # the lower limit is never negative. Data too spread out to fit is clipped below.
+def _get_shared_scale_ylim_opts(
+    ds_location, ylim_range, step=30, fallback_step=10, max_days=365
+):
+    # Y-axis limits spanning ylim_range days, with ticks at multiples of step days. The
+    # upper limit is the lowest multiple of step above the data (or of fallback_step if
+    # that does not fit the data), capped at max_days but at least ylim_range, so the
+    # lower limit is never negative. Data too spread out to fit is clipped below.
     data_min = min(ds_location[var].min().item() for var in ds_location.data_vars)
     data_max = max(ds_location[var].max().item() for var in ds_location.data_vars)
-    upper = max(int(data_max // step + 1) * step, ylim_range)
-    lower = upper - ylim_range
-    if data_min < lower:
+    for limit_step in (step, fallback_step):
+        upper = min(
+            max(int(data_max // limit_step + 1) * limit_step, ylim_range), max_days
+        )
+        lower = upper - ylim_range
+        if data_min >= lower:
+            break
+    else:
         warnings.warn(
             f"{ds_location.location.item()} data ({data_min:g} to {data_max:g} days) "
             f"does not fit a y-axis range of {ylim_range} days, so is clipped below "
             f"{lower}.",
             stacklevel=2,
         )
-    return {"ylim": (lower, upper), "yticks": list(range(lower, upper + 1, step))}
+    first_tick = -(-lower // step) * step
+    return {"ylim": (lower, upper), "yticks": list(range(first_tick, upper + 1, step))}
 
 
 def _make_map_plot(ds, plot_var, **kwargs):
